@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  fluxo-db:
+    image: postgres:16-alpine
+    container_name: fluxo-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret_pass
+      - POSTGRES_DB=fluxo_db
+    volumes:
+      - fluxo-data:/var/lib/postgresql/data
+
+volumes:
+  fluxo-data:

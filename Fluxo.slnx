@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="Fluxo.Api/Fluxo.Api.csproj" />
+  <Project Path="Fluxo.Application/Fluxo.Application.csproj" />
+  <Project Path="Fluxo.Domain/Fluxo.Domain.csproj" />
+  <Project Path="Fluxo.Infrastructure/Fluxo.Infrastructure.csproj" />
+</Solution>
