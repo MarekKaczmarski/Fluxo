@@ -1,3 +1,4 @@
+using Fluxo.Application.Transactions.Commands;
 using Fluxo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<FluxoDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<ICreateTransactionHandler, CreateTransactionHandler>();
 
 var app = builder.Build();
 
