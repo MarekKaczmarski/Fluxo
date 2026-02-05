@@ -1,4 +1,4 @@
-﻿using Fluxo.Application.Transactions.Commands;
+﻿using Fluxo.Application.Transactions.Commands.CreateTransaction;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
