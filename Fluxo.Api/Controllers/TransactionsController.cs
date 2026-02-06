@@ -3,19 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransactionsController : ControllerBase
+public class TransactionsController(ICreateTransactionHandler handler) : ControllerBase
 {
-    private readonly ICreateTransactionHandler _handler;
-
-    public TransactionsController(ICreateTransactionHandler handler)
-    {
-        _handler = handler;
-    }
-
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(CreateTransactionCommand command)
     {
-        var result = await _handler.Handle(command, default);
-        return Ok(result);
+        var id = await handler.Handle(command, default);
+        return Ok(id);
     }
 }
