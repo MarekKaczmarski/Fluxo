@@ -1,21 +1,22 @@
-﻿using Fluxo.Application.Common.Interfaces;
+﻿using FluentValidation;
+using Fluxo.Application.Common.Interfaces;
 using Fluxo.Domain.Entities;
 
 namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 
-public interface ICreateTransactionHandler
+public class CreateTransactionHandler(
+    IFluxoDbContext context,
+    IValidator<CreateTransactionCommand> validator)
+    : ICreateTransactionHandler
 {
-    Task<Guid> Handle(CreateTransactionCommand command, CancellationToken ct);
-}
-
-public class CreateTransactionHandler : ICreateTransactionHandler
-{
-    private readonly IFluxoDbContext _context;
-
-    public CreateTransactionHandler(IFluxoDbContext context) => _context = context;
-
     public async Task<Guid> Handle(CreateTransactionCommand command, CancellationToken ct)
     {
+        var validationResult = await validator.ValidateAsync(command, ct);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
         var entity = new Transaction
         {
             Id = Guid.NewGuid(),
@@ -26,8 +27,9 @@ public class CreateTransactionHandler : ICreateTransactionHandler
             AccountId = command.AccountId
         };
 
-        _context.Transactions.Add(entity);
-        await _context.SaveChangesAsync(ct);
+        context.Transactions.Add(entity);
+        await context.SaveChangesAsync(ct);
+
         return entity.Id;
     }
 }
