@@ -1,9 +1,10 @@
-﻿using Fluxo.Domain.Entities;
+﻿using Fluxo.Application.Common.Interfaces;
+using Fluxo.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Infrastructure.Data;
 
-public class FluxoDbContext : DbContext
+public class FluxoDbContext : DbContext, IFluxoDbContext
 {
     public FluxoDbContext(DbContextOptions<FluxoDbContext> options) : base(options) { }
 
