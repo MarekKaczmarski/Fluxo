@@ -1,4 +1,5 @@
 using FluentValidation;
+using Fluxo.Api.Exceptions;
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Application.Transactions.Commands.CreateTransaction;
 using Fluxo.Infrastructure.Data;
@@ -12,6 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddDbContext<FluxoDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IFluxoDbContext>(provider =>
@@ -21,6 +25,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionCommandVal
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
