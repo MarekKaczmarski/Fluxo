@@ -2,6 +2,7 @@ using FluentValidation;
 using Fluxo.Api.Exceptions;
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Application.Transactions.Commands.CreateTransaction;
+using Fluxo.Application.Transactions.Queries.GetTransactions;
 using Fluxo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services.AddDbContext<FluxoDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IFluxoDbContext>(provider =>
     provider.GetRequiredService<FluxoDbContext>());
+builder.Services.AddScoped<IGetTransactionsHandler, GetTransactionsHandler>();
 builder.Services.AddScoped<ICreateTransactionHandler, CreateTransactionHandler>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionCommandValidator>();
 
