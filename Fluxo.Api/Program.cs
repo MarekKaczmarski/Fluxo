@@ -21,9 +21,17 @@ builder.Services.AddDbContext<FluxoDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IFluxoDbContext>(provider =>
     provider.GetRequiredService<FluxoDbContext>());
-builder.Services.AddScoped<IGetTransactionsHandler, GetTransactionsHandler>();
-builder.Services.AddScoped<ICreateTransactionHandler, CreateTransactionHandler>();
+//builder.Services.AddScoped<IGetTransactionsHandler, GetTransactionsHandler>();
+//builder.Services.AddScoped<ICreateTransactionHandler, CreateTransactionHandler>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionCommandValidator>();
+
+builder.Services.Scan(scan => scan
+    .FromAssemblies(
+        typeof(ICreateTransactionHandler).Assembly,
+        typeof(FluxoDbContext).Assembly)
+    .AddClasses(classes => classes.Where(type => type.Name.EndsWith("Handler")))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
 
 var app = builder.Build();
 
