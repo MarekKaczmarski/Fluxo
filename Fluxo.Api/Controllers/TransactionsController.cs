@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class TransactionsController(
     IGetTransactionsHandler getHandler,
-    ICreateTransactionHandler handler) : ControllerBase
+    ICreateTransactionHandler createHandler,
 {
     [HttpGet]
     public async Task<ActionResult<List<TransactionDto>>> Get(CancellationToken ct)
@@ -18,7 +18,7 @@ public class TransactionsController(
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(CreateTransactionCommand command)
     {
-        var id = await handler.Handle(command, default);
+        var id = await createHandler.Handle(command, default);
         return Ok(id);
     }
 }
