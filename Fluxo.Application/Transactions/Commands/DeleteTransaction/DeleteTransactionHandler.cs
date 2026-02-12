@@ -1,4 +1,5 @@
-﻿using Fluxo.Application.Common.Interfaces;
+﻿using Fluxo.Application.Exceptions;
+using Fluxo.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,11 +12,13 @@ namespace Fluxo.Application.Transactions.Commands.DeleteTransaction
         {
             var transaction = await context.Transactions.FindAsync(command.Id);
 
-            if (transaction != null)
+            if (transaction is null)
             {
-                context.Transactions.Remove(transaction);
-                await context.SaveChangesAsync(ct);
+                throw new NotFoundException($"Transaction with ID {command.Id} was not found.");
             }
+
+            context.Transactions.Remove(transaction);
+            await context.SaveChangesAsync(ct);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Fluxo.Application.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         var problemDetails = exception switch
         {
             ValidationException validationEx => CreateValidationProblemDetails(httpContext, validationEx),
+            NotFoundException notFoundEx => CreateNotFoundProblemDetails(httpContext, notFoundEx),
             _ => CreateInternalServerErrorProblemDetails(httpContext, exception)
         };
 
@@ -45,6 +47,18 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             );
 
         return problemDetails;
+    }
+
+    private ProblemDetails CreateNotFoundProblemDetails(HttpContext context, NotFoundException ex)
+    {
+        return new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
+            Title = "Resource not found",
+            Detail = ex.Message,
+            Instance = context.Request.Path
+        };
     }
 
     private ProblemDetails CreateInternalServerErrorProblemDetails(HttpContext context, Exception ex)
