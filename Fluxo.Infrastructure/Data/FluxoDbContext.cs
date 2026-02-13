@@ -16,18 +16,20 @@ public class FluxoDbContext : DbContext, IFluxoDbContext
         {
             entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.Title)
+            entity.Property(e => e.Description)
                 .IsRequired()
                 .HasMaxLength(100);
 
             entity.Property(e => e.Amount)
-                .HasColumnType("decimal(18,2)");
-
-            entity.Property(e => e.Category)
-                .IsRequired()
-                .HasMaxLength(50);
+                .HasPrecision(18,2);
 
             entity.Property(e => e.Date)
+                .IsRequired();
+
+            entity.Property(e => e.CategoryId)
+                .IsRequired();
+
+            entity.Property(e => e.AccountId)
                 .IsRequired();
         });
     }
