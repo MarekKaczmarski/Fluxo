@@ -11,10 +11,11 @@ public class GetTransactionsHandler(IFluxoDbContext context) : IGetTransactionsH
             .OrderByDescending(x => x.Date)
             .Select(t => new TransactionDto(
                 t.Id,
-                t.Title,
+                t.Description,
                 t.Amount,
                 t.Date,
-                t.Category))
+                t.CategoryId,
+                t.AccountId))
             .ToListAsync(ct);
     }
 }

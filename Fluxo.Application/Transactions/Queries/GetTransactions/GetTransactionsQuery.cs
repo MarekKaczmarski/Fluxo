@@ -3,7 +3,8 @@
 public record GetTransactionsQuery();
 public record TransactionDto(
     Guid Id,
-    string Title,
+    string Description,
     decimal Amount,
     DateTime Date,
-    string Category);
+    Guid CategoryId,
+    Guid AccountId);
