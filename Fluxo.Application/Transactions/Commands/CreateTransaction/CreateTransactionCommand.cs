@@ -1,8 +1,8 @@
 ﻿namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 
 public record CreateTransactionCommand(
-    string Title,
+    string Description,
     decimal Amount,
     DateTime Date,
-    string Category,
+    Guid CategoryId,
     Guid AccountId);

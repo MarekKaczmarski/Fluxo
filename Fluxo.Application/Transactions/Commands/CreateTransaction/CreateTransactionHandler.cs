@@ -20,10 +20,10 @@ public class CreateTransactionHandler(
         var entity = new Transaction
         {
             Id = Guid.NewGuid(),
-            Title = command.Title,
+            Description = command.Description,
             Amount = command.Amount,
             Date = command.Date,
-            Category = command.Category,
+            CategoryId = command.CategoryId,
             AccountId = command.AccountId
         };
 
