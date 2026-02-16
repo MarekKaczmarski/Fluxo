@@ -8,29 +8,11 @@ public class FluxoDbContext : DbContext, IFluxoDbContext
 {
     public FluxoDbContext(DbContextOptions<FluxoDbContext> options) : base(options) { }
 
-    public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<Transaction> Transactions { get; set; } = default!;
+    public DbSet<Category> Categories { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Transaction>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-
-            entity.Property(e => e.Description)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            entity.Property(e => e.Amount)
-                .HasPrecision(18,2);
-
-            entity.Property(e => e.Date)
-                .IsRequired();
-
-            entity.Property(e => e.CategoryId)
-                .IsRequired();
-
-            entity.Property(e => e.AccountId)
-                .IsRequired();
-        });
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FluxoDbContext).Assembly);
     }
 }
