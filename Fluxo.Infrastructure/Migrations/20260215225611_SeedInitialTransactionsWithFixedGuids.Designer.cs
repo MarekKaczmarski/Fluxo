@@ -3,6 +3,7 @@ using System;
 using Fluxo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fluxo.Infrastructure.Migrations
 {
     [DbContext(typeof(FluxoDbContext))]
-    partial class FluxoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260215225611_SeedInitialTransactionsWithFixedGuids")]
+    partial class SeedInitialTransactionsWithFixedGuids
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,15 +46,15 @@ namespace Fluxo.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("550e8400-e29b-41d4-a716-446655440000"),
-                            Icon = "wallet",
-                            Name = "Transfer"
-                        },
-                        new
-                        {
                             Id = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
                             Icon = "utensils",
                             Name = "Food"
+                        },
+                        new
+                        {
+                            Id = new Guid("550e8400-e29b-41d4-a716-446655440000"),
+                            Icon = "wallet",
+                            Name = "Transfer"
                         },
                         new
                         {
@@ -111,7 +114,7 @@ namespace Fluxo.Infrastructure.Migrations
                             Amount = -150.50m,
                             CategoryId = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
                             Date = new DateTime(2024, 5, 20, 10, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Grocery"
+                            Description = "Grocery shopping"
                         },
                         new
                         {
@@ -126,10 +129,10 @@ namespace Fluxo.Infrastructure.Migrations
                         {
                             Id = new Guid("a555e888-4444-4444-4444-111122223333"),
                             AccountId = new Guid("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"),
-                            Amount = -45.00m,
-                            CategoryId = new Guid("d4c3b2a1-f6e5-4b5a-ac6d-9f8e7d6c5b4a"),
+                            Amount = -899.99m,
+                            CategoryId = new Guid("a1b2c3d4-e5f6-4a5b-bc6d-7e8f9a0b1c2d"),
                             Date = new DateTime(2024, 5, 22, 9, 30, 0, 0, DateTimeKind.Utc),
-                            Description = "Pharmacy"
+                            Description = "Wireless Headphones"
                         });
                 });
 
