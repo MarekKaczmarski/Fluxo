@@ -4,12 +4,12 @@ using Fluxo.Domain.Entities;
 
 namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 
-public class CreateTransactionHandler(
+public class CreateTransactionCommandHandler(
     IFluxoDbContext context,
     IValidator<CreateTransactionCommand> validator)
     : ICreateTransactionHandler
 {
-    public async Task<Guid> Handle(CreateTransactionCommand command, CancellationToken ct)
+    public async Task<Guid> HandleAsync(CreateTransactionCommand command, CancellationToken ct)
     {
         var validationResult = await validator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
