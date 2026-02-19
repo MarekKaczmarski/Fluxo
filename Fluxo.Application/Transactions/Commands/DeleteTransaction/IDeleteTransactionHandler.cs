@@ -2,6 +2,6 @@
 {
     public interface IDeleteTransactionHandler
     {
-        Task Handle(DeleteTransactionCommand command, CancellationToken ct);
+        Task HandleAsync(DeleteTransactionCommand command, CancellationToken ct);
     }
 }
