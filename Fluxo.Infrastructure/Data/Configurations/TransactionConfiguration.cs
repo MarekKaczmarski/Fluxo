@@ -21,9 +21,10 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.Date)
             .IsRequired();
 
-        builder.HasOne<Category>()
+        builder.HasOne(t => t.Category)
             .WithMany(c => c.Transactions)
             .HasForeignKey(t => t.CategoryId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(t => t.AccountId)
