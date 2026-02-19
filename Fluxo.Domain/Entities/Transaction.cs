@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Fluxo.Domain.Entities
@@ -11,6 +12,9 @@ namespace Fluxo.Domain.Entities
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
         public Guid CategoryId { get; set; }
+
+        [ForeignKey("CategoryId")]
+        public virtual Category Category { get; set; } = default!;
         public Guid AccountId { get; set; }
     }
 }
