@@ -6,6 +6,6 @@ namespace Fluxo.Application.Transactions.Commands.CreateTransaction
 {
     public interface ICreateTransactionHandler
     {
-        Task<Guid> Handle(CreateTransactionCommand command, CancellationToken ct);
+        Task<Guid> HandleAsync(CreateTransactionCommand command, CancellationToken ct);
     }
 }
