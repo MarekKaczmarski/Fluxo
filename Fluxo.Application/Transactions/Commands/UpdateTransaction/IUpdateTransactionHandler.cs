@@ -6,6 +6,6 @@ namespace Fluxo.Application.Transactions.Commands.UpdateTransaction
 {
     public interface IUpdateTransactionHandler
     {
-        Task Handle(UpdateTransactionCommand command, CancellationToken ct);
+        Task HandleAsync(UpdateTransactionCommand command, CancellationToken ct);
     }
 }

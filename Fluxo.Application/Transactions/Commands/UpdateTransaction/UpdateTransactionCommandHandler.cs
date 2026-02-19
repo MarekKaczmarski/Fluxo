@@ -6,9 +6,9 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Fluxo.Application.Transactions.Commands.UpdateTransaction
 {
-    public class UpdateTransactionHandler(IFluxoDbContext context) : IUpdateTransactionHandler
+    public class UpdateTransactionCommandHandler(IFluxoDbContext context) : IUpdateTransactionHandler
     {
-        public async Task Handle(UpdateTransactionCommand command, CancellationToken ct)
+        public async Task HandleAsync(UpdateTransactionCommand command, CancellationToken ct)
         {
             var transaction = await context.Transactions.FindAsync(new object[] { command.Id }, ct);
 
