@@ -14,36 +14,36 @@ public class TransactionsController(
     : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<TransactionDto>>> Get(CancellationToken ct)
+    public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions(CancellationToken ct)
     {
-        var result = await getHandler.Handle(new GetTransactionsQuery(), ct);
+        var result = await getHandler.HandleAsync(new GetTransactionsQuery(), ct);
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Guid>> Create(CreateTransactionCommand command, CancellationToken ct)
+    public async Task<ActionResult<Guid>> CreateTransaction(CreateTransactionCommand command, CancellationToken ct)
     {
-        var id = await createHandler.Handle(command, default);
+        var id = await createHandler.HandleAsync(command, default);
         return Ok(id);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult> Update(Guid id, UpdateTransactionCommand command, CancellationToken ct)
+    public async Task<ActionResult> UpdateTransaction(Guid id, UpdateTransactionCommand command, CancellationToken ct)
     {
         if (id != command.Id)
         {
             return BadRequest("ID in URL does not match ID in body.");
         }
 
-        await updateHandler.Handle(command, ct);
+        await updateHandler.HandleAsync(command, ct);
 
         return NoContent();
     }
 
     [HttpDelete]
-    public async Task<ActionResult> Delete(Guid id, CancellationToken ct)
+    public async Task<ActionResult> DeleteTransaction(Guid id, CancellationToken ct)
     {
-        await deleteHandler.Handle(new DeleteTransactionCommand(id), default);
+        await deleteHandler.HandleAsync(new DeleteTransactionCommand(id), default);
         return NoContent();
     }
 }
