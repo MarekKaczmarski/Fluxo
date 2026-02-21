@@ -1,10 +1,10 @@
-﻿using Fluxo.Application.Common.Interfaces;
+﻿using Fluxo.Application.Categories.Command;
+using Fluxo.Application.Common.Interfaces;
 using Fluxo.Domain.Entities;
-using Fluxo.Infrastructure.Data;
 
-namespace Fluxo.Application.Categories.Commands.CreateCategory;
+namespace Fluxo.Application.Categories.Command.CreateCategory;
 
-public class CreateCategoryHandler(FluxoDbContext context) : ICreateCategoryHandler
+public class CreateCategoryCommandHandler(IFluxoDbContext context) : ICreateCategoryHandler
 {
     public async Task<Guid> HandleAsync(CreateCategoryCommand command, CancellationToken ct)
     {
@@ -12,8 +12,7 @@ public class CreateCategoryHandler(FluxoDbContext context) : ICreateCategoryHand
         {
             Id = Guid.NewGuid(),
             Name = command.Name,
-            Icon = command.Icon,
-            Color = command.Color
+            Icon = command.Icon
         };
 
         context.Categories.Add(category);
