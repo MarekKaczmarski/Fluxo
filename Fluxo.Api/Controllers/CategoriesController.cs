@@ -1,4 +1,6 @@
 ﻿using Fluxo.Application.Categories.Command;
+using Fluxo.Application.Categories.Command.UpdateCategory;
+using Fluxo.Application.Categories.Commands.UpdateCategory;
 using Fluxo.Application.Categories.Queries.GetCategories;
 using Fluxo.Application.Transactions.Commands.CreateTransaction;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +11,8 @@ namespace Fluxo.Api.Controllers
     [Route("api/[controller]")]
     public class CategoriesController(
         IGetCategoriesHandler getHandler,
-        ICreateCategoryHandler createHandler) 
+        ICreateCategoryHandler createHandler,
+        IUpdateCategoryHandler updateHandler) 
         : ControllerBase
     {
         [HttpGet]
@@ -24,6 +27,14 @@ namespace Fluxo.Api.Controllers
         {
             var id = await createHandler.HandleAsync(command, default);
             return Ok(id);
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateCategory(Guid id, UpdateCategoryCommand command, CancellationToken ct)
+        {
+            if (id != command.Id) return BadRequest();
+            await updateHandler.HandleAsync(command, ct);
+            return NoContent();
         }
     }
 }
