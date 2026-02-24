@@ -1,4 +1,5 @@
 ﻿using Fluxo.Application.Categories.Command;
+using Fluxo.Application.Categories.Command.DeleteCategory;
 using Fluxo.Application.Categories.Command.UpdateCategory;
 using Fluxo.Application.Categories.Commands.UpdateCategory;
 using Fluxo.Application.Categories.Queries.GetCategories;
@@ -12,7 +13,8 @@ namespace Fluxo.Api.Controllers
     public class CategoriesController(
         IGetCategoriesHandler getHandler,
         ICreateCategoryHandler createHandler,
-        IUpdateCategoryHandler updateHandler) 
+        IUpdateCategoryHandler updateHandler,
+        IDeleteCategoryHandler deleteHandler) 
         : ControllerBase
     {
         [HttpGet]
@@ -34,6 +36,13 @@ namespace Fluxo.Api.Controllers
         {
             if (id != command.Id) return BadRequest();
             await updateHandler.HandleAsync(command, ct);
+            return NoContent();
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteCategory(Guid id, CancellationToken ct)
+        {
+            await deleteHandler.HandleAsync(new DeleteCategoryCommand(id), ct);
             return NoContent();
         }
     }
