@@ -1,13 +1,21 @@
-﻿using Fluxo.Application.Categories.Command;
+﻿using FluentValidation;
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Domain.Entities;
 
 namespace Fluxo.Application.Categories.Command.CreateCategory;
 
-public class CreateCategoryCommandHandler(IFluxoDbContext context) : ICreateCategoryHandler
+public class CreateCategoryCommandHandler(
+    IFluxoDbContext context,
+    IValidator<CreateCategoryCommand> validator) : ICreateCategoryHandler
 {
     public async Task<Guid> HandleAsync(CreateCategoryCommand command, CancellationToken ct)
     {
+        var validationResult = await validator.ValidateAsync(command, ct);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
         var category = new Category
         {
             Id = Guid.NewGuid(),
