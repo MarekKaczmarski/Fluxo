@@ -16,5 +16,6 @@ namespace Fluxo.Domain.Entities
         [ForeignKey("CategoryId")]
         public virtual Category Category { get; set; } = default!;
         public Guid AccountId { get; set; }
+        public Account Account { get; set; } = default!;
     }
 }
