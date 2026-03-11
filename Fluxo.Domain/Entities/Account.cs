@@ -10,7 +10,7 @@ namespace Fluxo.Domain.Entities
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
         public decimal Balance { get; set; }
-        public string Currency { get; set; } = "";
+        public string Currency { get; set; } = "PLN";
 
         public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
