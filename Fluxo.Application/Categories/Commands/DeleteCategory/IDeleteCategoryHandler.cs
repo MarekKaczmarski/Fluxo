@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Fluxo.Application.Categories.Command.DeleteCategory
+﻿namespace Fluxo.Application.Categories.Commands.DeleteCategory
 {
     public interface IDeleteCategoryHandler
     {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Fluxo.Application.Categories.Command
+﻿namespace Fluxo.Application.Categories.Commands.CreateCategory
 {
     public interface ICreateCategoryHandler
     {

@@ -1,6 +1,6 @@
-﻿using Fluxo.Application.Categories.Command;
-using Fluxo.Application.Categories.Command.DeleteCategory;
-using Fluxo.Application.Categories.Command.UpdateCategory;
+﻿using Fluxo.Application.Categories.Commands.CreateCategory;
+using Fluxo.Application.Categories.Commands.DeleteCategory;
+using Fluxo.Application.Categories.Commands.UpdateCategory;
 using Fluxo.Application.Categories.Commands.UpdateCategory;
 using Fluxo.Application.Categories.Queries.GetCategories;
 using Fluxo.Application.Transactions.Commands.CreateTransaction;

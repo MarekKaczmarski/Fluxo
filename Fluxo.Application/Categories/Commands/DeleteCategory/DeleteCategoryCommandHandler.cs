@@ -1,10 +1,6 @@
-﻿
-using Fluxo.Application.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Fluxo.Application.Common.Interfaces;
 
-namespace Fluxo.Application.Categories.Command.DeleteCategory
+namespace Fluxo.Application.Categories.Commands.DeleteCategory
 {
     public class DeleteCategoryHandler(IFluxoDbContext context) : IDeleteCategoryHandler
     {

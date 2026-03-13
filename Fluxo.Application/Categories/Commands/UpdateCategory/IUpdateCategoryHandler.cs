@@ -1,6 +1,4 @@
-﻿using Fluxo.Application.Categories.Commands.UpdateCategory;
-
-namespace Fluxo.Application.Categories.Command.UpdateCategory
+﻿namespace Fluxo.Application.Categories.Commands.UpdateCategory
 {
     public interface IUpdateCategoryHandler
     {

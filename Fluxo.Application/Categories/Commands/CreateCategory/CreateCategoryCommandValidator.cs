@@ -2,7 +2,7 @@
 using Fluxo.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Fluxo.Application.Categories.Command
+namespace Fluxo.Application.Categories.Commands.CreateCategory
 {
     public class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
     {

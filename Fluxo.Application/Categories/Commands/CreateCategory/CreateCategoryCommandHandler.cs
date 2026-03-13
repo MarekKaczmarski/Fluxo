@@ -2,7 +2,7 @@
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Domain.Entities;
 
-namespace Fluxo.Application.Categories.Command.CreateCategory;
+namespace Fluxo.Application.Categories.Commands.CreateCategory;
 
 public class CreateCategoryCommandHandler(
     IFluxoDbContext context,

@@ -1,5 +1,4 @@
-﻿using Fluxo.Application.Categories.Command.UpdateCategory;
-using Fluxo.Application.Common.Interfaces;
+﻿using Fluxo.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Categories.Commands.UpdateCategory;
