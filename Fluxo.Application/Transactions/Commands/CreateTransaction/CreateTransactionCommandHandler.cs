@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 
@@ -17,19 +18,30 @@ public class CreateTransactionCommandHandler(
             throw new ValidationException(validationResult.Errors);
         }
 
-        var entity = new Transaction
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(a => a.Id == command.AccountId, ct);
+
+        if (account == null)
+        {
+            throw new Exception("Account not found.");
+        }
+
+        var transaction = new Transaction
         {
             Id = Guid.NewGuid(),
-            Description = command.Description,
             Amount = command.Amount,
+            Description = command.Description,
             Date = command.Date,
             CategoryId = command.CategoryId,
             AccountId = command.AccountId
         };
 
-        context.Transactions.Add(entity);
+        account.Balance += transaction.Amount;
+
+        context.Transactions.Add(transaction);
+
         await context.SaveChangesAsync(ct);
 
-        return entity.Id;
+        return transaction.Id;
     }
 }
