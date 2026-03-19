@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Transactions.Queries.GetTransactions;
 
-public class GetTransactionsQueryHandler(IFluxoDbContext context) : IGetTransactionsHandler
+public class GetTransactionsQueryHandler(IFluxoDbContext context) : IGetTransactionsQueryHandler
 {
     public async Task<IEnumerable<TransactionDto>> HandleAsync(GetTransactionsQuery query, CancellationToken ct)
     {

@@ -8,7 +8,7 @@ namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 public class CreateTransactionCommandHandler(
     IFluxoDbContext context,
     IValidator<CreateTransactionCommand> validator)
-    : ICreateTransactionHandler
+    : ICreateTransactionCommandHandler
 {
     public async Task<Guid> HandleAsync(CreateTransactionCommand command, CancellationToken ct)
     {

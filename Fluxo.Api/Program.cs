@@ -27,7 +27,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionCommandVal
 
 builder.Services.Scan(scan => scan
     .FromAssemblies(
-        typeof(ICreateTransactionHandler).Assembly,
+        typeof(ICreateTransactionCommandHandler).Assembly,
         typeof(FluxoDbContext).Assembly)
     .AddClasses(classes => classes.Where(type => type.Name.EndsWith("Handler")))
     .AsImplementedInterfaces()

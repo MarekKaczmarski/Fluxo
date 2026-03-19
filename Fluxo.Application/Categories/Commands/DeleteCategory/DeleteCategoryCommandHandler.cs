@@ -2,7 +2,7 @@
 
 namespace Fluxo.Application.Categories.Commands.DeleteCategory
 {
-    public class DeleteCategoryHandler(IFluxoDbContext context) : IDeleteCategoryHandler
+    public class DeleteCategoryHandler(IFluxoDbContext context) : IDeleteCategoryCommandHandler
     {
         public async Task HandleAsync(DeleteCategoryCommand command, CancellationToken ct)
         {

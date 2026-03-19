@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Categories.Commands.UpdateCategory;
 
-public class UpdateCategoryCommandHandler(IFluxoDbContext context) : IUpdateCategoryHandler
+public class UpdateCategoryCommandHandler(IFluxoDbContext context) : IUpdateCategoryCommandHandler
 {
     public async Task HandleAsync(UpdateCategoryCommand command, CancellationToken ct)
     {

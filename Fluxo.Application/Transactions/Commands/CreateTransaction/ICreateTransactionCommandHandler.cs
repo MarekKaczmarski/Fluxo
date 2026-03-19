@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Fluxo.Application.Transactions.Commands.CreateTransaction
 {
-    public interface ICreateTransactionHandler
+    public interface ICreateTransactionCommandHandler
     {
         Task<Guid> HandleAsync(CreateTransactionCommand command, CancellationToken ct);
     }

@@ -6,7 +6,7 @@ namespace Fluxo.Application.Categories.Commands.CreateCategory;
 
 public class CreateCategoryCommandHandler(
     IFluxoDbContext context,
-    IValidator<CreateCategoryCommand> validator) : ICreateCategoryHandler
+    IValidator<CreateCategoryCommand> validator) : ICreateCategoryCommandHandler
 {
     public async Task<Guid> HandleAsync(CreateCategoryCommand command, CancellationToken ct)
     {

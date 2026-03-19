@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Fluxo.Application.Transactions.Commands.DeleteTransaction
 {
-    public class DeleteTransactionCommandHandler(IFluxoDbContext context) : IDeleteTransactionHandler
+    public class DeleteTransactionCommandHandler(IFluxoDbContext context) : IDeleteTransactionCommandHandler
     {
         public async Task HandleAsync(DeleteTransactionCommand command, CancellationToken ct)
         {

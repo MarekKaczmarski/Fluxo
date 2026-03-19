@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 [Route("api/[controller]")]
 public class TransactionsController(
-    IGetTransactionsHandler getHandler,
-    ICreateTransactionHandler createHandler,
-    IUpdateTransactionHandler updateHandler,
-    IDeleteTransactionHandler deleteHandler) 
+    IGetTransactionsQueryHandler getHandler,
+    ICreateTransactionCommandHandler createHandler,
+    IUpdateTransactionCommandHandler updateHandler,
+    IDeleteTransactionCommandHandler deleteHandler) 
     : ControllerBase
 {
     [HttpGet]

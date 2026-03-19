@@ -1,7 +1,6 @@
 ﻿using Fluxo.Application.Categories.Commands.CreateCategory;
 using Fluxo.Application.Categories.Commands.DeleteCategory;
 using Fluxo.Application.Categories.Commands.UpdateCategory;
-using Fluxo.Application.Categories.Commands.UpdateCategory;
 using Fluxo.Application.Categories.Queries.GetCategories;
 using Fluxo.Application.Transactions.Commands.CreateTransaction;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +11,9 @@ namespace Fluxo.Api.Controllers
     [Route("api/[controller]")]
     public class CategoriesController(
         IGetCategoriesHandler getHandler,
-        ICreateCategoryHandler createHandler,
-        IUpdateCategoryHandler updateHandler,
-        IDeleteCategoryHandler deleteHandler) 
+        ICreateCategoryCommandHandler createHandler,
+        IUpdateCategoryCommandHandler updateHandler,
+        IDeleteCategoryCommandHandler deleteHandler) 
         : ControllerBase
     {
         [HttpGet]
