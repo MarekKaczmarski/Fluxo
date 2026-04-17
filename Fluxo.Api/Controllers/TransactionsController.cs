@@ -40,7 +40,7 @@ public class TransactionsController(
         return NoContent();
     }
 
-    [HttpDelete]
+    [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteTransaction(Guid id, CancellationToken ct)
     {
         await deleteHandler.HandleAsync(new DeleteTransactionCommand(id), default);
