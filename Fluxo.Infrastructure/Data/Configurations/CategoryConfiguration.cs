@@ -15,6 +15,11 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.HasMany<Transaction>()
+            .WithOne(t => t.Category)
+            .HasForeignKey(t => t.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasData(CategorySeeder.GetSeedData());
     }
 }
