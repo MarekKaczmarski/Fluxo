@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fluxo.Infrastructure.Migrations
 {
     [DbContext(typeof(FluxoDbContext))]
-    [Migration("20260215225611_SeedInitialTransactionsWithFixedGuids")]
-    partial class SeedInitialTransactionsWithFixedGuids
+    [Migration("20260513204042_InitialReal")]
+    partial class InitialReal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,43 @@ namespace Fluxo.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Fluxo.Domain.Entities.Account", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Accounts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"),
+                            Balance = 5000.00m,
+                            Currency = "PLN",
+                            Description = "Default personal cash wallet",
+                            Name = "Main Wallet"
+                        });
+                });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Category", b =>
                 {
@@ -46,15 +83,15 @@ namespace Fluxo.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
-                            Icon = "utensils",
-                            Name = "Food"
-                        },
-                        new
-                        {
                             Id = new Guid("550e8400-e29b-41d4-a716-446655440000"),
                             Icon = "wallet",
                             Name = "Transfer"
+                        },
+                        new
+                        {
+                            Id = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
+                            Icon = "utensils",
+                            Name = "Food"
                         },
                         new
                         {
@@ -102,6 +139,8 @@ namespace Fluxo.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccountId");
+
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Transactions");
@@ -114,7 +153,7 @@ namespace Fluxo.Infrastructure.Migrations
                             Amount = -150.50m,
                             CategoryId = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
                             Date = new DateTime(2024, 5, 20, 10, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Grocery shopping"
+                            Description = "Grocery"
                         },
                         new
                         {
@@ -129,20 +168,35 @@ namespace Fluxo.Infrastructure.Migrations
                         {
                             Id = new Guid("a555e888-4444-4444-4444-111122223333"),
                             AccountId = new Guid("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"),
-                            Amount = -899.99m,
-                            CategoryId = new Guid("a1b2c3d4-e5f6-4a5b-bc6d-7e8f9a0b1c2d"),
+                            Amount = -45.00m,
+                            CategoryId = new Guid("d4c3b2a1-f6e5-4b5a-ac6d-9f8e7d6c5b4a"),
                             Date = new DateTime(2024, 5, 22, 9, 30, 0, 0, DateTimeKind.Utc),
-                            Description = "Wireless Headphones"
+                            Description = "Pharmacy"
                         });
                 });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Transaction", b =>
                 {
-                    b.HasOne("Fluxo.Domain.Entities.Category", null)
+                    b.HasOne("Fluxo.Domain.Entities.Account", "Account")
+                        .WithMany("Transactions")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Fluxo.Domain.Entities.Category", "Category")
                         .WithMany("Transactions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Fluxo.Domain.Entities.Account", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Category", b =>

@@ -46,7 +46,17 @@ namespace Fluxo.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts", (string)null);
+                    b.ToTable("Accounts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"),
+                            Balance = 5000.00m,
+                            Currency = "PLN",
+                            Description = "Default personal cash wallet",
+                            Name = "Main Wallet"
+                        });
                 });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Category", b =>
@@ -65,7 +75,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
 
                     b.HasData(
                         new
@@ -130,7 +140,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
 
                     b.HasData(
                         new
