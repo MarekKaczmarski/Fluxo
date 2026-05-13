@@ -1,4 +1,5 @@
 ﻿using Fluxo.Domain.Entities;
+using Fluxo.Infrastructure.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,5 +23,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .WithOne(t => t.Account)
             .HasForeignKey(t => t.AccountId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasData(AccountSeeder.GetSeedData());
     }
 }
