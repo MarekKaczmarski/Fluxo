@@ -1,8 +1,11 @@
-﻿namespace Fluxo.Application.Transactions.Commands.UpdateTransaction;
+﻿using Fluxo.Domain.Enums;
+
+namespace Fluxo.Application.Transactions.Commands.UpdateTransaction;
 
 public record UpdateTransactionCommand(
     Guid Id,
     string Description,
     decimal Amount,
     DateTime Date,
-    Guid CategoryId);
+    Guid CategoryId,
+    TransactionType Type);
