@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Fluxo.Application.Common.Interfaces;
-using Fluxo.Domain.Entities;
+using Fluxo.Application.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
@@ -13,33 +13,29 @@ public class CreateTransactionCommandHandler(
     public async Task<Guid> HandleAsync(CreateTransactionCommand command, CancellationToken ct)
     {
         var validationResult = await validator.ValidateAsync(command, ct);
-        if (!validationResult.IsValid)
-        {
-            throw new ValidationException(validationResult.Errors);
-        }
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
         var account = await context.Accounts
             .FirstOrDefaultAsync(a => a.Id == command.AccountId, ct);
 
-        if (account == null)
-        {
-            throw new Exception("Account not found.");
-        }
+        if (account is null)
+            throw new NotFoundException($"Account with ID {command.AccountId} was not found.");
 
-        var transaction = new Transaction
-        {
-            Id = Guid.NewGuid(),
-            Amount = command.Amount,
-            Description = command.Description,
-            Date = command.Date,
-            CategoryId = command.CategoryId,
-            AccountId = command.AccountId
-        };
+        var categoryExists = await context.Categories
+            .AnyAsync(c => c.Id == command.CategoryId, ct);
 
-        account.Balance += transaction.Amount;
+        if (!categoryExists)
+            throw new NotFoundException($"Category with ID {command.CategoryId} was not found.");
+
+        var transaction = account.RegisterTransaction(
+            Guid.NewGuid(),
+            command.Amount,
+            command.Description,
+            command.Date,
+            command.CategoryId,
+            command.Type);
 
         context.Transactions.Add(transaction);
-
         await context.SaveChangesAsync(ct);
 
         return transaction.Id;
