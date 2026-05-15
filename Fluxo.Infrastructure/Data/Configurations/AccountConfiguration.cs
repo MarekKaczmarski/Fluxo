@@ -24,6 +24,6 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasForeignKey(t => t.AccountId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasData(AccountSeeder.GetSeedData());
+        //builder.HasData(AccountSeeder.GetSeedData());
     }
 }

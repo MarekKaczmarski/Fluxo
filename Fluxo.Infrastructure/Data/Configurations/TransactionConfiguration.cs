@@ -35,6 +35,6 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.AccountId)
             .IsRequired();
 
-        builder.HasData(TransactionSeeder.GetSeedData());
+        //builder.HasData(TransactionSeeder.GetSeedData().ToArray());
     }
 }

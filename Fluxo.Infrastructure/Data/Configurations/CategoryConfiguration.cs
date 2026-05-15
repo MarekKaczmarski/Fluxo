@@ -20,6 +20,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .HasForeignKey(t => t.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasData(CategorySeeder.GetSeedData());
+        //builder.HasData(CategorySeeder.GetSeedData().ToArray());
     }
 }
