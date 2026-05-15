@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 
@@ -8,10 +8,10 @@ public class CreateTransactionCommandValidator : AbstractValidator<CreateTransac
     {
         RuleFor(v => v.Description)
             .NotEmpty().WithMessage("Description is required.")
-            .MaximumLength(100).WithMessage("Description must not exceed 100 characters.");
+            .MaximumLength(200).WithMessage("Description must not exceed 200 characters.");
 
         RuleFor(v => v.Amount)
-            .NotEqual(0).WithMessage("Amount cannot be zero.");
+            .GreaterThan(0).WithMessage("Amount must be greater than zero.");
 
         RuleFor(v => v.Date)
             .NotEmpty().WithMessage("Date is required.")
@@ -22,5 +22,8 @@ public class CreateTransactionCommandValidator : AbstractValidator<CreateTransac
 
         RuleFor(x => x.AccountId)
             .NotEmpty().WithMessage("AccountId is required.");
+
+        RuleFor(v => v.Type)
+            .IsInEnum().WithMessage("Transaction type is invalid.");
     }
 }
