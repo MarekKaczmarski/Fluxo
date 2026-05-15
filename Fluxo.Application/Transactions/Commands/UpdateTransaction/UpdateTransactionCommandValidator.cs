@@ -1,30 +1,29 @@
-﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using FluentValidation;
 
-namespace Fluxo.Application.Transactions.Commands.UpdateTransaction
+namespace Fluxo.Application.Transactions.Commands.UpdateTransaction;
+
+public class UpdateTransactionCommandValidator : AbstractValidator<UpdateTransactionCommand>
 {
-    public class UpdateTransactionCommandValidator : AbstractValidator<UpdateTransactionCommand>
+    public UpdateTransactionCommandValidator()
     {
-        public UpdateTransactionCommandValidator()
-        {
-            RuleFor(x => x.Id)
-                .NotEmpty().WithMessage("Transaction ID is required.");
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("Transaction ID is required.");
 
-            RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("Description is required.")
-                .MaximumLength(200).WithMessage("Description must not exceed 200 characters.");
+        RuleFor(x => x.Description)
+            .NotEmpty().WithMessage("Description is required.")
+            .MaximumLength(200).WithMessage("Description must not exceed 200 characters.");
 
-            RuleFor(x => x.Amount)
-                .NotEqual(0).WithMessage("Amount cannot be zero.");
+        RuleFor(x => x.Amount)
+            .GreaterThan(0).WithMessage("Amount must be greater than zero.");
 
-            RuleFor(x => x.Date)
-                .NotEmpty().WithMessage("Date is required.")
-                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Date cannot be in the future.");
+        RuleFor(x => x.Date)
+            .NotEmpty().WithMessage("Date is required.")
+            .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Date cannot be in the future.");
 
-            RuleFor(x => x.CategoryId)
-                .NotEmpty().WithMessage("CategoryId is required.");
-        }
+        RuleFor(x => x.CategoryId)
+            .NotEmpty().WithMessage("CategoryId is required.");
+
+        RuleFor(x => x.Type)
+            .IsInEnum().WithMessage("Transaction type is invalid.");
     }
 }
