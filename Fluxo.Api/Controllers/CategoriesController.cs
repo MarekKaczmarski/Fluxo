@@ -1,8 +1,7 @@
-﻿using Fluxo.Application.Categories.Commands.CreateCategory;
+using Fluxo.Application.Categories.Commands.CreateCategory;
 using Fluxo.Application.Categories.Commands.DeleteCategory;
 using Fluxo.Application.Categories.Commands.UpdateCategory;
 using Fluxo.Application.Categories.Queries.GetCategories;
-using Fluxo.Application.Transactions.Commands.CreateTransaction;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fluxo.Api.Controllers
@@ -13,7 +12,7 @@ namespace Fluxo.Api.Controllers
         IGetCategoriesHandler getHandler,
         ICreateCategoryCommandHandler createHandler,
         IUpdateCategoryCommandHandler updateHandler,
-        IDeleteCategoryCommandHandler deleteHandler) 
+        IDeleteCategoryCommandHandler deleteHandler)
         : ControllerBase
     {
         [HttpGet]
@@ -26,14 +25,15 @@ namespace Fluxo.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Guid>> CreateCategory(CreateCategoryCommand command, CancellationToken ct)
         {
-            var id = await createHandler.HandleAsync(command, default);
+            var id = await createHandler.HandleAsync(command, ct);
             return Ok(id);
         }
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateCategory(Guid id, UpdateCategoryCommand command, CancellationToken ct)
         {
-            if (id != command.Id) return BadRequest();
+            if (id != command.Id) return BadRequest("ID in URL does not match ID in body.");
+
             await updateHandler.HandleAsync(command, ct);
             return NoContent();
         }
