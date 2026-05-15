@@ -1,5 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Fluxo.Application.Exceptions;
+using Fluxo.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         {
             ValidationException validationEx => CreateValidationProblemDetails(httpContext, validationEx),
             NotFoundException notFoundEx => CreateNotFoundProblemDetails(httpContext, notFoundEx),
-            _ => CreateInternalServerErrorProblemDetails(httpContext, exception)
+            ConflictException conflictEx => CreateConflictProblemDetails(httpContext, conflictEx),
+            DomainException domainEx => CreateBadRequestProblemDetails(httpContext, domainEx),
+            _ => CreateInternalServerErrorProblemDetails(httpContext)
         };
 
         httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
@@ -61,7 +64,31 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         };
     }
 
-    private ProblemDetails CreateInternalServerErrorProblemDetails(HttpContext context, Exception ex)
+    private ProblemDetails CreateBadRequestProblemDetails(HttpContext context, DomainException ex)
+    {
+        return new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+            Title = "Domain rule violation",
+            Detail = ex.Message,
+            Instance = context.Request.Path
+        };
+    }
+
+    private ProblemDetails CreateConflictProblemDetails(HttpContext context, ConflictException ex)
+    {
+        return new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.8",
+            Title = "Conflict",
+            Detail = ex.Message,
+            Instance = context.Request.Path
+        };
+    }
+
+    private ProblemDetails CreateInternalServerErrorProblemDetails(HttpContext context)
     {
         return new ProblemDetails
         {
