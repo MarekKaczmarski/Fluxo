@@ -1,4 +1,4 @@
-﻿using Fluxo.Application.Transactions.Commands.CreateTransaction;
+using Fluxo.Application.Transactions.Commands.CreateTransaction;
 using Fluxo.Application.Transactions.Commands.DeleteTransaction;
 using Fluxo.Application.Transactions.Commands.UpdateTransaction;
 using Fluxo.Application.Transactions.Queries.GetTransactions;
@@ -10,7 +10,7 @@ public class TransactionsController(
     IGetTransactionsQueryHandler getHandler,
     ICreateTransactionCommandHandler createHandler,
     IUpdateTransactionCommandHandler updateHandler,
-    IDeleteTransactionCommandHandler deleteHandler) 
+    IDeleteTransactionCommandHandler deleteHandler)
     : ControllerBase
 {
     [HttpGet]
@@ -23,7 +23,7 @@ public class TransactionsController(
     [HttpPost]
     public async Task<ActionResult<Guid>> CreateTransaction(CreateTransactionCommand command, CancellationToken ct)
     {
-        var id = await createHandler.HandleAsync(command, default);
+        var id = await createHandler.HandleAsync(command, ct);
         return Ok(id);
     }
 
@@ -43,7 +43,7 @@ public class TransactionsController(
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteTransaction(Guid id, CancellationToken ct)
     {
-        await deleteHandler.HandleAsync(new DeleteTransactionCommand(id), default);
+        await deleteHandler.HandleAsync(new DeleteTransactionCommand(id), ct);
         return NoContent();
     }
 }
