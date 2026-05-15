@@ -1,4 +1,4 @@
-﻿using Fluxo.Application.Common.Interfaces;
+using Fluxo.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Transactions.Queries.GetTransactions;
@@ -17,7 +17,8 @@ public class GetTransactionsQueryHandler(IFluxoDbContext context) : IGetTransact
                 Amount = t.Amount,
                 Date = t.Date,
                 CategoryId = t.CategoryId,
-                CategoryName = t.Category.Name
+                CategoryName = t.Category.Name,
+                Type = t.Type
             })
             .ToListAsync(ct);
     }
