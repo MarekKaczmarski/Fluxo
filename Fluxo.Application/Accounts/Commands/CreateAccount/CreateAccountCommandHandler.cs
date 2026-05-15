@@ -1,9 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Fluxo.Application.Accounts.Commands.CreateAccount
 {
@@ -14,18 +11,9 @@ namespace Fluxo.Application.Accounts.Commands.CreateAccount
         public async Task<Guid> HandleAsync(CreateAccountCommand command, CancellationToken ct)
         {
             var validationResult = await validator.ValidateAsync(command, ct);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-            var account = new Account
-            {
-                Id = Guid.NewGuid(),
-                Name = command.Name,
-                Balance = command.InitialBalance,
-                Currency = command.Currency
-            };
+            var account = new Account(Guid.NewGuid(), command.Name, command.InitialBalance, command.Currency);
 
             context.Accounts.Add(account);
             await context.SaveChangesAsync(ct);

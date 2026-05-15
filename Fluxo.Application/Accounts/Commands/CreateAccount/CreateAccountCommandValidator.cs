@@ -1,7 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Fluxo.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace Fluxo.Application.Accounts.Commands.CreateAccount
 {
@@ -20,7 +19,8 @@ namespace Fluxo.Application.Accounts.Commands.CreateAccount
 
             RuleFor(x => x.Currency)
                 .NotEmpty().WithMessage("Currency is required.")
-                .Length(3).WithMessage("Currency must be a 3-letter ISO code.");
+                .Length(3).WithMessage("Currency must be a 3-letter ISO code.")
+                .Matches("^[A-Za-z]{3}$").WithMessage("Currency must contain only letters.");
         }
 
         private async Task<bool> BeUniqueName(string name, CancellationToken ct)
