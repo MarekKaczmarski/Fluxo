@@ -1,3 +1,3 @@
-﻿namespace Fluxo.Application.Categories.Commands.UpdateCategory;
+namespace Fluxo.Application.Categories.Commands.UpdateCategory;
 
-public record UpdateCategoryCommand(Guid Id, string Name, string? Icon, string? Color);
+public record UpdateCategoryCommand(Guid Id, string Name, string? Icon);
