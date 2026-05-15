@@ -1,4 +1,4 @@
-﻿using Fluxo.Application.Accounts.Commands.CreateAccount;
+using Fluxo.Application.Accounts.Commands.CreateAccount;
 using Fluxo.Application.Accounts.Commands.DeleteAccount;
 using Fluxo.Application.Accounts.Commands.UpdateAccount;
 using Fluxo.Application.Accounts.Queries.GetAccounts;
@@ -30,30 +30,30 @@ namespace Fluxo.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AccountDto>>> GetAccounts(CancellationToken ct)
         {
-            var accounts = await _getAccountsHandler.HandleAsync();
+            var accounts = await _getAccountsHandler.HandleAsync(new GetAccountsQuery(), ct);
             return Ok(accounts);
         }
 
         [HttpPost]
         public async Task<ActionResult<Guid>> CreateAccount(CreateAccountCommand command, CancellationToken ct)
         {
-            var accountId = await _createAccountHandler.HandleAsync(command);
+            var accountId = await _createAccountHandler.HandleAsync(command, ct);
             return Ok(accountId);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdateAccount(Guid id, UpdateAccountCommand command, CancellationToken ct)
         {
-            if (id != command.Id) return BadRequest();
+            if (id != command.Id) return BadRequest("ID in URL does not match ID in body.");
 
-            await _updateAccountHandler.HandleAsync(command);
+            await _updateAccountHandler.HandleAsync(command, ct);
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteAccount(Guid id, CancellationToken ct)
         {
-            await _deleteAccountHandler.HandleAsync(id);
+            await _deleteAccountHandler.HandleAsync(new DeleteAccountCommand(id), ct);
             return NoContent();
         }
     }
