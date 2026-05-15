@@ -8,13 +8,6 @@ public static class AccountSeeder
 {
     public static IEnumerable<Account> GetSeedData() => new List<Account>
     {
-        new()
-        {
-            Id = SeedDataConstants.DefaultAccountId,
-            Name = "Main Wallet",
-            Description = "Default personal cash wallet",
-            Balance = 5000.00m,
-            Currency = "PLN"
-        }
+        new Account(SeedDataConstants.DefaultAccountId, "Main Wallet", 5000.00m, "PLN")
     };
 }

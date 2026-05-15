@@ -9,11 +9,11 @@ namespace Fluxo.Infrastructure.Data.Seeding
     {
         public static IEnumerable<Category> GetSeedData() => new List<Category>
         {
-            new() { Id = SeedDataConstants.TransferCategoryId, Name = "Transfer", Icon = "wallet" },
-            new() { Id = SeedDataConstants.FoodCategoryId, Name = "Food", Icon = "utensils" },
-            new() { Id = SeedDataConstants.ElectronicsCategoryId, Name = "Electronics", Icon = "smartphone" },
-            new() { Id = SeedDataConstants.PharmacyCategoryId, Name = "Pharmacy", Icon = "pill" },
-            new() { Id = SeedDataConstants.TransportCategoryId, Name = "Transport", Icon = "bus" }
+            new Category(SeedDataConstants.TransferCategoryId, "Transfer", "wallet"),
+            new Category(SeedDataConstants.FoodCategoryId, "Food", "utensils"),
+            new Category(SeedDataConstants.ElectronicsCategoryId, "Electronics", "smartphone"),
+            new Category(SeedDataConstants.PharmacyCategoryId, "Pharmacy", "pill"),
+            new Category(SeedDataConstants.TransportCategoryId, "Transport", "bus")
         };
     }
 }
