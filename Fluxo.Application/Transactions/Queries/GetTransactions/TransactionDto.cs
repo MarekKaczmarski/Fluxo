@@ -1,4 +1,6 @@
-﻿namespace Fluxo.Application.Transactions.Queries.GetTransactions
+using Fluxo.Domain.Enums;
+
+namespace Fluxo.Application.Transactions.Queries.GetTransactions
 {
     public class TransactionDto
     {
@@ -8,5 +10,6 @@
         public DateTime Date { get; set; }
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; } = default!;
+        public TransactionType Type { get; set; }
     }
 }
