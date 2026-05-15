@@ -11,17 +11,9 @@ public class CreateCategoryCommandHandler(
     public async Task<Guid> HandleAsync(CreateCategoryCommand command, CancellationToken ct)
     {
         var validationResult = await validator.ValidateAsync(command, ct);
-        if (!validationResult.IsValid)
-        {
-            throw new ValidationException(validationResult.Errors);
-        }
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var category = new Category
-        {
-            Id = Guid.NewGuid(),
-            Name = command.Name,
-            Icon = command.Icon
-        };
+        var category = new Category(Guid.NewGuid(), command.Name, command.Icon);
 
         context.Categories.Add(category);
         await context.SaveChangesAsync(ct);
