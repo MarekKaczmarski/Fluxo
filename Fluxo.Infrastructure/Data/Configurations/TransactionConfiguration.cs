@@ -1,5 +1,4 @@
-﻿using Fluxo.Domain.Entities;
-using Fluxo.Infrastructure.Data.Seeding;
+using Fluxo.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,8 +14,25 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(t => t.Amount)
-            .HasPrecision(18, 2);
+        builder.OwnsOne(t => t.Amount, money =>
+        {
+            money.Property(m => m.Amount)
+                .HasColumnName("Amount")
+                .HasPrecision(18, 2)
+                .IsRequired();
+
+            money.OwnsOne(m => m.Currency, currency =>
+            {
+                currency.Property(c => c.Code)
+                    .HasColumnName("Currency")
+                    .HasMaxLength(3)
+                    .IsRequired();
+            });
+
+            money.Navigation(m => m.Currency).IsRequired();
+        });
+
+        builder.Navigation(t => t.Amount).IsRequired();
 
         builder.Property(t => t.Date)
             .IsRequired();
