@@ -1,5 +1,6 @@
 using Fluxo.Domain.Enums;
 using Fluxo.Domain.Exceptions;
+using Fluxo.Domain.ValueObjects;
 
 namespace Fluxo.Domain.Entities
 {
@@ -7,8 +8,8 @@ namespace Fluxo.Domain.Entities
     {
         public Guid Id { get; private set; }
         public string Name { get; private set; } = default!;
-        public decimal Balance { get; private set; }
-        public string Currency { get; private set; } = "PLN";
+        public Money Balance { get; private set; } = default!;
+        public Currency Currency => Balance.Currency;
 
         public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
@@ -16,18 +17,21 @@ namespace Fluxo.Domain.Entities
 
         public Account(Guid id, string name, decimal balance, string currency)
         {
-            Validate(id, name, currency);
+            Validate(id, name);
+
+            var accountCurrency = Currency.FromCode(currency);
 
             Id = id;
             Name = name.Trim();
-            Balance = balance;
-            Currency = currency.Trim().ToUpperInvariant();
+            Balance = new Money(balance, accountCurrency);
         }
 
         public Transaction RegisterTransaction(Guid transactionId, decimal amount, string description, DateTime date, Guid categoryId, TransactionType type)
         {
-            var transaction = new Transaction(transactionId, amount, description, date, categoryId, Id, type);
-            Balance += GetBalanceDelta(transaction.Amount, transaction.Type);
+            var money = Money.Positive(amount, Currency);
+            var transaction = new Transaction(transactionId, money, description, date, categoryId, Id, type);
+
+            ApplyTransaction(transaction.Amount, transaction.Type);
             Transactions.Add(transaction);
 
             return transaction;
@@ -37,16 +41,16 @@ namespace Fluxo.Domain.Entities
         {
             EnsureTransactionBelongsToAccount(transaction);
 
-            Balance -= GetBalanceDelta(transaction.Amount, transaction.Type);
-            transaction.Update(description, amount, date, categoryId, type);
-            Balance += GetBalanceDelta(transaction.Amount, transaction.Type);
+            RevertTransaction(transaction.Amount, transaction.Type);
+            transaction.Update(Money.Positive(amount, Currency), description, date, categoryId, type);
+            ApplyTransaction(transaction.Amount, transaction.Type);
         }
 
         public void RemoveTransaction(Transaction transaction)
         {
             EnsureTransactionBelongsToAccount(transaction);
 
-            Balance -= GetBalanceDelta(transaction.Amount, transaction.Type);
+            RevertTransaction(transaction.Amount, transaction.Type);
             Transactions.Remove(transaction);
         }
 
@@ -61,15 +65,22 @@ namespace Fluxo.Domain.Entities
             Name = name.Trim();
         }
 
-        private static decimal GetBalanceDelta(decimal amount, TransactionType type)
+        private void ApplyTransaction(Money amount, TransactionType type)
         {
-            if (amount <= 0)
-                throw new DomainException("Transaction amount must be greater than zero.");
-
-            return type switch
+            Balance = type switch
             {
-                TransactionType.Expense => -amount,
-                TransactionType.Income => amount,
+                TransactionType.Expense => Balance.Subtract(amount),
+                TransactionType.Income => Balance.Add(amount),
+                _ => throw new DomainException("Transaction type is invalid.")
+            };
+        }
+
+        private void RevertTransaction(Money amount, TransactionType type)
+        {
+            Balance = type switch
+            {
+                TransactionType.Expense => Balance.Add(amount),
+                TransactionType.Income => Balance.Subtract(amount),
                 _ => throw new DomainException("Transaction type is invalid.")
             };
         }
@@ -80,7 +91,7 @@ namespace Fluxo.Domain.Entities
                 throw new DomainException("Transaction does not belong to this account.");
         }
 
-        private static void Validate(Guid id, string name, string currency)
+        private static void Validate(Guid id, string name)
         {
             if (id == Guid.Empty)
                 throw new DomainException("Account ID is required.");
@@ -90,12 +101,6 @@ namespace Fluxo.Domain.Entities
 
             if (name.Length > 100)
                 throw new DomainException("Account name must not exceed 100 characters.");
-
-            if (string.IsNullOrWhiteSpace(currency))
-                throw new DomainException("Currency is required.");
-
-            if (currency.Trim().Length != 3)
-                throw new DomainException("Currency must be a 3-letter ISO code.");
         }
     }
 }

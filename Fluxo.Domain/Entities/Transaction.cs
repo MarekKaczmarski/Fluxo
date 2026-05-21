@@ -1,5 +1,6 @@
 using Fluxo.Domain.Enums;
 using Fluxo.Domain.Exceptions;
+using Fluxo.Domain.ValueObjects;
 
 namespace Fluxo.Domain.Entities
 {
@@ -7,7 +8,7 @@ namespace Fluxo.Domain.Entities
     {
         public Guid Id { get; private set; }
         public string Description { get; private set; } = string.Empty;
-        public decimal Amount { get; private set; }
+        public Money Amount { get; private set; } = default!;
         public DateTime Date { get; private set; }
         public Guid CategoryId { get; private set; }
         public Category Category { get; private set; } = default!;
@@ -17,12 +18,12 @@ namespace Fluxo.Domain.Entities
 
         private Transaction() { }
 
-        public Transaction(Guid id, decimal amount, string description, DateTime date, Guid categoryId, Guid accountId, TransactionType type)
+        public Transaction(Guid id, Money amount, string description, DateTime date, Guid categoryId, Guid accountId, TransactionType type)
         {
             Validate(id, amount, description, date, categoryId, accountId, type);
 
             Id = id;
-            Amount = amount;
+            Amount = amount.EnsurePositive();
             Description = description.Trim();
             Date = date;
             CategoryId = categoryId;
@@ -30,24 +31,23 @@ namespace Fluxo.Domain.Entities
             Type = type;
         }
 
-        public void Update(string description, decimal amount, DateTime date, Guid categoryId, TransactionType type)
+        public void Update(Money amount, string description, DateTime date, Guid categoryId, TransactionType type)
         {
             Validate(Id, amount, description, date, categoryId, AccountId, type);
 
+            Amount = amount.EnsurePositive();
             Description = description.Trim();
-            Amount = amount;
             Date = date;
             CategoryId = categoryId;
             Type = type;
         }
 
-        private static void Validate(Guid id, decimal amount, string description, DateTime date, Guid categoryId, Guid accountId, TransactionType type)
+        private static void Validate(Guid id, Money amount, string description, DateTime date, Guid categoryId, Guid accountId, TransactionType type)
         {
             if (id == Guid.Empty)
                 throw new DomainException("Transaction ID is required.");
 
-            if (amount <= 0)
-                throw new DomainException("Transaction amount must be greater than zero.");
+            amount.EnsurePositive();
 
             if (string.IsNullOrWhiteSpace(description))
                 throw new DomainException("Transaction description is required.");
