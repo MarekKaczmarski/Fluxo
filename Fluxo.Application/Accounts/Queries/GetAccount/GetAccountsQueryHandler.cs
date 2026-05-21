@@ -13,8 +13,8 @@ public class GetAccountsQueryHandler(IFluxoDbContext context) : IGetAccountsQuer
             {
                 Id = a.Id,
                 Name = a.Name,
-                Balance = a.Balance,
-                Currency = a.Currency
+                Balance = a.Balance.Amount,
+                Currency = a.Balance.Currency.Code
             })
             .ToListAsync(ct);
     }

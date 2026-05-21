@@ -14,10 +14,11 @@ public class GetTransactionsQueryHandler(IFluxoDbContext context) : IGetTransact
             {
                 Id = t.Id,
                 Description = t.Description,
-                Amount = t.Amount,
+                Amount = t.Amount.Amount,
                 Date = t.Date,
                 CategoryId = t.CategoryId,
                 CategoryName = t.Category.Name,
+                Currency = t.Amount.Currency.Code,
                 Type = t.Type
             })
             .ToListAsync(ct);

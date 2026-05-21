@@ -10,6 +10,7 @@ namespace Fluxo.Application.Transactions.Queries.GetTransactions
         public DateTime Date { get; set; }
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; } = default!;
+        public string Currency { get; set; } = default!;
         public TransactionType Type { get; set; }
     }
 }
