@@ -11,6 +11,7 @@ public class FluxoDbContext : DbContext, IFluxoDbContext
     public DbSet<Transaction> Transactions { get; set; } = default!;
     public DbSet<Category> Categories { get; set; } = default!;
     public DbSet<Account> Accounts { get; set; } = default!;
+    public DbSet<User> Users { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
