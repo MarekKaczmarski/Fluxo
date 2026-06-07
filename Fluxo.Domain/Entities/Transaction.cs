@@ -35,7 +35,7 @@ namespace Fluxo.Domain.Entities
         {
             Validate(Id, amount, description, date, categoryId, AccountId, type);
 
-            Amount = amount.EnsurePositive();
+            Amount = amount;
             Description = description.Trim();
             Date = date;
             CategoryId = categoryId;
