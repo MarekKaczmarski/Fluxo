@@ -1,11 +1,31 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import TransactionManager from './components/TransactionManager.vue'
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <main class="app-container">
+    <header class="app-header">
+      <h1>Fluxo App</h1>
+    </header>
+
+    <TransactionManager />
+  </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: sans-serif;
+}
+.app-header {
+  border-bottom: 2px solid #eee;
+  margin-bottom: 2rem;
+  padding-bottom: 0.5rem;
+}
+h1 {
+  color: #333;
+  margin: 0;
+}
+</style>
