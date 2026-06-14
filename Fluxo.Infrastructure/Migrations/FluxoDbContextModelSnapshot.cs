@@ -35,7 +35,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Category", b =>
@@ -54,7 +54,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Transaction", b =>
@@ -86,56 +86,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Transactions");
-                });
-
-            modelBuilder.Entity("Fluxo.Domain.Entities.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(320)
-                        .HasColumnType("character varying(320)");
-
-                    b.Property<string>("GoogleSubject")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("NormalizedEmail")
-                        .IsRequired()
-                        .HasMaxLength(320)
-                        .HasColumnType("character varying(320)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<int>("RegistrationProvider")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId")
-                        .IsUnique();
-
-                    b.HasIndex("GoogleSubject")
-                        .IsUnique();
-
-                    b.HasIndex("NormalizedEmail")
-                        .IsUnique();
-
-                    b.ToTable("Users");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Account", b =>
@@ -152,7 +103,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                             b1.HasKey("AccountId");
 
-                            b1.ToTable("Accounts");
+                            b1.ToTable("Accounts", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("AccountId");
@@ -170,7 +121,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                                     b2.HasKey("MoneyAccountId");
 
-                                    b2.ToTable("Accounts");
+                                    b2.ToTable("Accounts", (string)null);
 
                                     b2.WithOwner()
                                         .HasForeignKey("MoneyAccountId");
@@ -210,7 +161,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                             b1.HasKey("TransactionId");
 
-                            b1.ToTable("Transactions");
+                            b1.ToTable("Transactions", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("TransactionId");
@@ -228,7 +179,7 @@ namespace Fluxo.Infrastructure.Migrations
 
                                     b2.HasKey("MoneyTransactionId");
 
-                                    b2.ToTable("Transactions");
+                                    b2.ToTable("Transactions", (string)null);
 
                                     b2.WithOwner()
                                         .HasForeignKey("MoneyTransactionId");
@@ -244,17 +195,6 @@ namespace Fluxo.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Fluxo.Domain.Entities.User", b =>
-                {
-                    b.HasOne("Fluxo.Domain.Entities.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Fluxo.Domain.Entities.Account", b =>

@@ -8,6 +8,5 @@ public interface IFluxoDbContext
     DbSet<Transaction> Transactions { get; }
     DbSet<Category> Categories { get; }
     DbSet<Account> Accounts { get; }
-    DbSet<User> Users { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
