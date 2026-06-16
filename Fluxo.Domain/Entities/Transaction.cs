@@ -13,7 +13,6 @@ namespace Fluxo.Domain.Entities
         public Guid CategoryId { get; private set; }
         public Category Category { get; private set; } = default!;
         public Guid AccountId { get; private set; }
-        public Account Account { get; private set; } = default!;
         public TransactionType Type { get; private set; }
 
         private Transaction() { }

@@ -1,4 +1,5 @@
 using Fluxo.Domain.Entities;
+using Fluxo.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,15 +22,14 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
                 .HasPrecision(18, 2)
                 .IsRequired();
 
-            money.OwnsOne(m => m.Currency, currency =>
-            {
-                currency.Property(c => c.Code)
+            money.Property(m => m.Currency)
+                    .HasConversion(
+                        c => c.Code,
+                        code => Currency.FromCode(code)
+                    )
                     .HasColumnName("Currency")
                     .HasMaxLength(3)
                     .IsRequired();
-            });
-
-            money.Navigation(m => m.Currency).IsRequired();
         });
 
         builder.Navigation(t => t.Amount).IsRequired();
@@ -37,19 +37,17 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.Date)
             .IsRequired();
 
-        builder.HasOne(t => t.Account)
-           .WithMany(a => a.Transactions)
+        builder.HasOne<Account>()
+           .WithMany()
            .HasForeignKey(t => t.AccountId)
+           .IsRequired()
            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(t => t.Category)
-            .WithMany(c => c.Transactions)
+            .WithMany()
             .HasForeignKey(t => t.CategoryId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Property(t => t.AccountId)
-            .IsRequired();
 
         //builder.HasData(TransactionSeeder.GetSeedData().ToArray());
     }

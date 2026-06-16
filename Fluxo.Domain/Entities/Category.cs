@@ -8,8 +8,6 @@ namespace Fluxo.Domain.Entities
         public string Name { get; private set; } = string.Empty;
         public string? Icon { get; private set; }
 
-        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
-
         private Category() { }
 
         public Category(Guid id, string name, string? icon)

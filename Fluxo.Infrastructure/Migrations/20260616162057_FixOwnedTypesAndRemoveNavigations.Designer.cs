@@ -3,6 +3,7 @@ using System;
 using Fluxo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Fluxo.Infrastructure.Migrations
 {
     [DbContext(typeof(FluxoDbContext))]
-    partial class FluxoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260616162057_FixOwnedTypesAndRemoveNavigations")]
+    partial class FixOwnedTypesAndRemoveNavigations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,18 +104,34 @@ namespace Fluxo.Infrastructure.Migrations
                                 .HasColumnType("numeric(18,2)")
                                 .HasColumnName("Balance");
 
-                            b1.Property<string>("Currency")
-                                .IsRequired()
-                                .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("Currency");
-
                             b1.HasKey("AccountId");
 
                             b1.ToTable("Accounts");
 
                             b1.WithOwner()
                                 .HasForeignKey("AccountId");
+
+                            b1.OwnsOne("Fluxo.Domain.ValueObjects.Currency", "Currency", b2 =>
+                                {
+                                    b2.Property<Guid>("MoneyAccountId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<string>("Code")
+                                        .IsRequired()
+                                        .HasMaxLength(3)
+                                        .HasColumnType("character varying(3)")
+                                        .HasColumnName("Currency");
+
+                                    b2.HasKey("MoneyAccountId");
+
+                                    b2.ToTable("Accounts");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("MoneyAccountId");
+                                });
+
+                            b1.Navigation("Currency")
+                                .IsRequired();
                         });
 
                     b.Navigation("Balance")
@@ -143,18 +162,34 @@ namespace Fluxo.Infrastructure.Migrations
                                 .HasColumnType("numeric(18,2)")
                                 .HasColumnName("Amount");
 
-                            b1.Property<string>("Currency")
-                                .IsRequired()
-                                .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("Currency");
-
                             b1.HasKey("TransactionId");
 
                             b1.ToTable("Transactions");
 
                             b1.WithOwner()
                                 .HasForeignKey("TransactionId");
+
+                            b1.OwnsOne("Fluxo.Domain.ValueObjects.Currency", "Currency", b2 =>
+                                {
+                                    b2.Property<Guid>("MoneyTransactionId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<string>("Code")
+                                        .IsRequired()
+                                        .HasMaxLength(3)
+                                        .HasColumnType("character varying(3)")
+                                        .HasColumnName("Currency");
+
+                                    b2.HasKey("MoneyTransactionId");
+
+                                    b2.ToTable("Transactions");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("MoneyTransactionId");
+                                });
+
+                            b1.Navigation("Currency")
+                                .IsRequired();
                         });
 
                     b.Navigation("Amount")

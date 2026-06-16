@@ -1,4 +1,5 @@
 using Fluxo.Domain.Entities;
+using Fluxo.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,23 +24,17 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
                 .HasPrecision(18, 2)
                 .IsRequired();
 
-            money.OwnsOne(m => m.Currency, currency =>
-            {
-                currency.Property(c => c.Code)
+            money.Property(m => m.Currency)
+                    .HasConversion(
+                        c => c.Code,
+                        code => Currency.FromCode(code)
+                    )
                     .HasColumnName("Currency")
                     .HasMaxLength(3)
                     .IsRequired();
-            });
-
-            money.Navigation(m => m.Currency).IsRequired();
         });
 
         builder.Navigation(a => a.Balance).IsRequired();
-
-        builder.HasMany(a => a.Transactions)
-            .WithOne(t => t.Account)
-            .HasForeignKey(t => t.AccountId)
-            .OnDelete(DeleteBehavior.Restrict);
 
         //builder.HasData(AccountSeeder.GetSeedData());
     }
