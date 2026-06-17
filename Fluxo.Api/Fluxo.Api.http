@@ -1,6 +1,116 @@
-@Fluxo.Api_HostAddress = http://localhost:5158
+@baseUrl = https://localhost:7001
 
-GET {{Fluxo.Api_HostAddress}}/weatherforecast/
+# Existing IDs from database (used for retrieval, updates, and deletion)
+@existingAccountId = bc12fd20-8489-45a9-8667-016fd1114109
+@existingCategoryId = e56238b7-2080-4b1c-aac1-1e583880444d
+@existingTransactionId = 30dcaec8-eda1-4248-8100-d521373e92dd
+
+# ==============================================================================
+# 1. CATEGORIES (Must be managed first so transactions can establish proper relations)
+# ==============================================================================
+
+### Get all categories
+GET {{baseUrl}}/api/Categories
 Accept: application/json
 
-###
+### Get a specific category by ID
+GET {{baseUrl}}/api/Categories/{{existingCategoryId}}
+Accept: application/json
+
+### Create a new category
+# @name createCategory
+POST {{baseUrl}}/api/Categories
+Content-Type: application/json
+
+{
+  "name": "Education & Books",
+  "icon": "book-icon"
+}
+
+### Update an existing category
+PUT {{baseUrl}}/api/Categories/{{existingCategoryId}}
+Content-Type: application/json
+
+{
+  "id": "{{existingCategoryId}}",
+  "name": "Food & Restaurants",
+  "icon": "fastfood-icon"
+}
+
+### Delete a category
+DELETE {{baseUrl}}/api/Categories/{{existingCategoryId}}
+
+# ==============================================================================
+# 2. ACCOUNTS
+# ==============================================================================
+
+### Get all accounts
+GET {{baseUrl}}/api/Accounts
+Accept: application/json
+
+### Get a specific account by ID
+GET {{baseUrl}}/api/Accounts/{{existingAccountId}}
+Accept: application/json
+
+### Create a new account
+# @name createAccount
+POST {{baseUrl}}/api/Accounts
+Content-Type: application/json
+
+{
+  "name": "Savings Account",
+  "currency": "PLN"
+}
+
+### Update an existing account
+PUT {{baseUrl}}/api/Accounts/{{existingAccountId}}
+Content-Type: application/json
+
+{
+  "id": "{{existingAccountId}}",
+  "name": "Main Personal Account"
+}
+
+### Delete an account
+DELETE {{baseUrl}}/api/Accounts/{{existingAccountId}}
+
+# ==============================================================================
+# 3. TRANSACTIONS
+# ==============================================================================
+
+### Get all transactions
+GET {{baseUrl}}/api/Transactions
+Accept: application/json
+
+### Get a specific transaction by ID
+GET {{baseUrl}}/api/Transactions/{{existingTransactionId}}
+Accept: application/json
+
+### Create a new transaction
+POST {{baseUrl}}/api/Transactions
+Content-Type: application/json
+
+{
+  "accountId": "{{existingAccountId}}",
+  "categoryId": "{{existingCategoryId}}",
+  "amount": 124.50,
+  "type": 0,
+  "description": "Grocery shopping at local market",
+  "date": "2026-06-16T19:45:00Z"
+}
+
+### Update an existing transaction
+PUT {{baseUrl}}/api/Transactions/{{existingTransactionId}}
+Content-Type: application/json
+
+{
+  "id": "{{existingTransactionId}}",
+  "categoryId": "{{existingCategoryId}}",
+  "amount": 65.00,
+  "type": 0,
+  "description": "KFC - upgraded combo meal",
+  "date": "2026-06-16T20:00:00Z"
+}
+
+### Delete a transaction
+DELETE {{baseUrl}}/api/Transactions/{{existingTransactionId}}
