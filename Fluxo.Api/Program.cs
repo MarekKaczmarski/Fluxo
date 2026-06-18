@@ -12,7 +12,11 @@ using Serilog.Exceptions;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+        theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code,
+        applyThemeToRedirectedOutput: true
+    )
     .CreateBootstrapLogger();
 
 try
@@ -23,6 +27,7 @@ try
     builder.Host.UseSerilog((_, __, configuration) => configuration
         .MinimumLevel.Information()
         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
         .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
         .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
         .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Information)
@@ -30,7 +35,8 @@ try
         .Enrich.WithExceptionDetails()
         .WriteTo.Console(
             outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
-            theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code
+            theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code,
+            applyThemeToRedirectedOutput: true
         ));
 
     builder.Services.AddOpenApi();
@@ -71,6 +77,20 @@ try
     var app = builder.Build();
 
     app.UseExceptionHandler();
+
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.MessageTemplate =
+            "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+
+        options.GetLevel = (httpContext, _, ex) =>
+            ex is not null || httpContext.Response.StatusCode >= StatusCodes.Status500InternalServerError
+                ? LogEventLevel.Error
+                : httpContext.Response.StatusCode >= StatusCodes.Status400BadRequest
+                    ? LogEventLevel.Warning
+                    : LogEventLevel.Information;
+    });
+
     app.UseHttpsRedirection();
 
     app.UseRouting();
