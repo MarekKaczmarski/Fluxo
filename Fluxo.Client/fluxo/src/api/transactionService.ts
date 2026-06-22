@@ -1,35 +1,28 @@
-export interface TransactionDto {
-  id: string
-  description: string
-  amount: number
-  currency: string
-  date: string
-  categoryId: string
-  type: number
-}
+import { apiRequest } from './apiClient'
+import type { CreateTransactionRequest, TransactionDto, UpdateTransactionRequest } from './models'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
+export type { TransactionDto } from './models'
 
 export async function getTransactions(): Promise<TransactionDto[]> {
-  const response = await fetch(`${API_BASE_URL}/transactions`)
-
-  if (!response.ok) {
-    throw new Error('An error occurred while fetching transactions')
-  }
-
-  return response.json()
+  return apiRequest<TransactionDto[]>('/transactions')
 }
 
-export async function updateTransaction(id: string, data: Partial<TransactionDto>): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+export async function createTransaction(data: CreateTransactionRequest): Promise<string> {
+  return apiRequest<string>('/transactions', {
+    method: 'POST',
     body: JSON.stringify(data),
   })
+}
 
-  if (!response.ok) {
-    throw new Error('An error occurred while updating the transaction')
-  }
+export async function updateTransaction(id: string, data: UpdateTransactionRequest): Promise<void> {
+  await apiRequest<void>(`/transactions/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteTransaction(id: string): Promise<void> {
+  await apiRequest<void>(`/transactions/${id}`, {
+    method: 'DELETE',
+  })
 }
