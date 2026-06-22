@@ -1,4 +1,4 @@
-@baseUrl = https://localhost:7001
+@baseUrl = http://localhost:7001
 
 # Existing IDs from database (used for retrieval, updates, and deletion)
 @existingAccountId = bc12fd20-8489-45a9-8667-016fd1114109
