@@ -10,6 +10,35 @@ services:
       - POSTGRES_DB=fluxo_db
     volumes:
       - fluxo-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d fluxo_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  fluxo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fluxo-api
+    ports:
+      - "7001:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=fluxo-db;Database=fluxo_db;Username=admin;Password=secret_pass
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      fluxo-db:
+        condition: service_healthy
+
+  fluxo-frontend:
+    build:
+      context: ./Fluxo.Client/fluxo
+      dockerfile: Dockerfile
+    container_name: fluxo-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - fluxo-api
 
 volumes:
   fluxo-data:
