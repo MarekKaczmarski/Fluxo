@@ -37,9 +37,9 @@ const classes = computed(() => cn(badgeVariants({ variant: props.variant }), pro
 </script>
 
 <template>
-  <span :class="classes">
+  <v-chip :class="classes" variant="text" density="compact" :ripple="false">
     <slot />
-  </span>
+  </v-chip>
 </template>
 
 <style scoped>
@@ -49,25 +49,32 @@ const classes = computed(() => cn(badgeVariants({ variant: props.variant }), pro
   border-radius: 999px;
   display: inline-flex;
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
+  height: auto;
+  letter-spacing: 0;
   line-height: 1;
   min-height: 1.5rem;
   padding: 0 0.55rem;
+  text-transform: none;
   white-space: nowrap;
 }
 
+.ui-badge :deep(.v-chip__content) {
+  padding: 0;
+}
+
 .ui-badge--default {
-  background: color-mix(in srgb, var(--color-primary) 14%, white);
-  color: var(--color-primary-strong);
+  background: color-mix(in srgb, var(--color-primary) 10%, white);
+  color: var(--color-primary);
 }
 
 .ui-badge--expense {
-  background: color-mix(in srgb, var(--color-expense) 13%, white);
+  background: color-mix(in srgb, var(--color-expense) 12%, white);
   color: var(--color-expense);
 }
 
 .ui-badge--income {
-  background: color-mix(in srgb, var(--color-income) 16%, white);
+  background: color-mix(in srgb, var(--color-income) 14%, white);
   color: var(--color-income-strong);
 }
 

@@ -51,18 +51,15 @@ const props = withDefaults(
   },
 )
 
-const classes = computed(() => cn(buttonVariants({ variant: props.variant, size: props.size }), props.class))
+const classes = computed(() =>
+  cn(buttonVariants({ variant: props.variant, size: props.size }), props.class),
+)
 </script>
 
 <template>
-  <component
-    :is="as"
-    :class="classes"
-    :disabled="disabled"
-    :type="as === 'button' ? type : undefined"
-  >
+  <v-btn :class="classes" :disabled="disabled" :type="type" variant="text">
     <slot />
-  </component>
+  </v-btn>
 </template>
 
 <style scoped>
@@ -76,9 +73,11 @@ const classes = computed(() => cn(buttonVariants({ variant: props.variant, size:
   font-weight: 700;
   gap: 0.5rem;
   justify-content: center;
+  letter-spacing: 0;
   line-height: 1;
   min-width: 0;
   text-decoration: none;
+  text-transform: none;
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
@@ -89,12 +88,17 @@ const classes = computed(() => cn(buttonVariants({ variant: props.variant, size:
   white-space: nowrap;
 }
 
+.ui-button :deep(.v-btn__content) {
+  gap: 0.5rem;
+}
+
 .ui-button:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--color-primary) 36%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 28%, transparent);
   outline-offset: 2px;
 }
 
-.ui-button:disabled {
+.ui-button:disabled,
+.ui-button.v-btn--disabled {
   cursor: not-allowed;
   opacity: 0.56;
 }
@@ -105,7 +109,6 @@ const classes = computed(() => cn(buttonVariants({ variant: props.variant, size:
 
 .ui-button--default {
   background: var(--color-primary);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-primary) 22%, transparent);
   color: white;
 }
 
@@ -129,7 +132,7 @@ const classes = computed(() => cn(buttonVariants({ variant: props.variant, size:
 }
 
 .ui-button--destructive:hover {
-  background: #d9515c;
+  background: #b91c1c;
 }
 
 .ui-button--outline {
@@ -148,14 +151,14 @@ const classes = computed(() => cn(buttonVariants({ variant: props.variant, size:
 }
 
 .ui-button--ghost:hover {
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  background: var(--color-surface-muted);
   color: var(--color-foreground);
 }
 
 .ui-button--balance {
   background: var(--color-primary);
-  border-color: color-mix(in srgb, var(--color-primary-strong) 68%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 24%, transparent);
+  border-color: var(--color-primary-strong);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 16%, transparent);
   color: white;
 }
 

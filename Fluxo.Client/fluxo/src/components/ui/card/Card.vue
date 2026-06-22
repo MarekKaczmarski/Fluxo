@@ -14,9 +14,9 @@ const classes = computed(() => cn('ui-card', props.class))
 </script>
 
 <template>
-  <section :class="classes">
+  <v-card :class="classes" variant="text">
     <slot />
-  </section>
+  </v-card>
 </template>
 
 <style scoped>

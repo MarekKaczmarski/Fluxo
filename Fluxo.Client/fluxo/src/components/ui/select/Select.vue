@@ -51,13 +51,17 @@ const classes = computed(() => cn('ui-select', props.class))
   width: 100%;
 }
 
+.ui-select:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
 .ui-select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent);
 }
 
 .ui-select:disabled {
   cursor: not-allowed;
-  opacity: 0.58;
+  opacity: 0.56;
 }
 </style>
