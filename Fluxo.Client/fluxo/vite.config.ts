@@ -14,7 +14,7 @@ export default defineConfig({
     }),
     vueJsx(),
     vueDevTools(),
-    vuetify({ autoImport: true }),
+    vuetify({ autoImport: { labs: true } }),
   ],
   resolve: {
     alias: {
