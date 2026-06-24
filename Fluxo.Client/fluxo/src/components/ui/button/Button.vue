@@ -16,6 +16,8 @@ const buttonVariants = cva('ui-button', {
       outline: 'ui-button--outline',
       ghost: 'ui-button--ghost',
       balance: 'ui-button--balance',
+      expense: 'ui-button--expense',
+      income: 'ui-button--income',
     },
     size: {
       default: 'ui-button--default-size',
@@ -160,6 +162,30 @@ const classes = computed(() =>
   border-color: var(--color-primary-strong);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, white 16%, transparent);
   color: white;
+}
+
+.ui-button--expense {
+  background: color-mix(in srgb, var(--color-expense) 12%, white);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  color: var(--color-expense);
+}
+
+.ui-button--expense:hover {
+  background: color-mix(in srgb, var(--color-expense) 20%, white);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-expense) 24%, transparent);
+  transform: translateY(-2px);
+}
+
+.ui-button--income {
+  background: color-mix(in srgb, var(--color-income) 12%, white);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  color: var(--color-income-strong);
+}
+
+.ui-button--income:hover {
+  background: color-mix(in srgb, var(--color-income) 20%, white);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-income) 24%, transparent);
+  transform: translateY(-2px);
 }
 
 .ui-button--default-size {
