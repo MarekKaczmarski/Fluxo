@@ -6,33 +6,42 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Fluxo.Api.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
     public class CategoriesController(
         IGetCategoriesHandler getHandler,
         ICreateCategoryCommandHandler createHandler,
         IUpdateCategoryCommandHandler updateHandler,
-        IDeleteCategoryCommandHandler deleteHandler)
-        : ControllerBase
+        IDeleteCategoryCommandHandler deleteHandler
+    ) : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories(CancellationToken ct)
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories(
+            CancellationToken ct
+        )
         {
             var result = await getHandler.HandleAsync(new GetCategoriesQuery(), ct);
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateCategory(CreateCategoryCommand command, CancellationToken ct)
+        public async Task<ActionResult<Guid>> CreateCategory(
+            CreateCategoryCommand command,
+            CancellationToken ct
+        )
         {
             var id = await createHandler.HandleAsync(command, ct);
-            return Ok(id);
+            return CreatedAtAction(nameof(GetCategories), new { id }, id);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateCategory(Guid id, UpdateCategoryCommand command, CancellationToken ct)
+        public async Task<IActionResult> UpdateCategory(
+            Guid id,
+            UpdateCategoryCommand command,
+            CancellationToken ct
+        )
         {
-            if (id != command.Id) return BadRequest("ID in URL does not match ID in body.");
+            if (EnsureMatchingId(id, command.Id) is { } error)
+                return error;
 
             await updateHandler.HandleAsync(command, ct);
             return NoContent();

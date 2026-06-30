@@ -6,39 +6,44 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Fluxo.Api.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
     public class TransactionsController(
         IGetTransactionsQueryHandler getHandler,
         ICreateTransactionCommandHandler createHandler,
         IUpdateTransactionCommandHandler updateHandler,
-        IDeleteTransactionCommandHandler deleteHandler)
-        : ControllerBase
+        IDeleteTransactionCommandHandler deleteHandler
+    ) : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions(CancellationToken ct)
+        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions(
+            CancellationToken ct
+        )
         {
             var result = await getHandler.HandleAsync(new GetTransactionsQuery(), ct);
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateTransaction(CreateTransactionCommand command, CancellationToken ct)
+        public async Task<ActionResult<Guid>> CreateTransaction(
+            CreateTransactionCommand command,
+            CancellationToken ct
+        )
         {
             var id = await createHandler.HandleAsync(command, ct);
-            return Ok(id);
+            return CreatedAtAction(nameof(GetTransactions), new { id }, id);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult> UpdateTransaction(Guid id, UpdateTransactionCommand command, CancellationToken ct)
+        public async Task<ActionResult> UpdateTransaction(
+            Guid id,
+            UpdateTransactionCommand command,
+            CancellationToken ct
+        )
         {
-            if (id != command.Id)
-            {
-                return BadRequest("ID in URL does not match ID in body.");
-            }
+            if (EnsureMatchingId(id, command.Id) is { } error)
+                return error;
 
             await updateHandler.HandleAsync(command, ct);
-
             return NoContent();
         }
 
