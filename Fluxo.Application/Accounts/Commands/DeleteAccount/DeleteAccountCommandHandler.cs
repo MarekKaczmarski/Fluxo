@@ -8,19 +8,19 @@ public class DeleteAccountCommandHandler(IFluxoDbContext context) : IDeleteAccou
 {
     public async Task HandleAsync(DeleteAccountCommand command, CancellationToken ct = default)
     {
-        var account = await context.Accounts
-            .FirstOrDefaultAsync(a => a.Id == command.Id, ct);
+        var accountExists = await context.Accounts.AnyAsync(a => a.Id == command.Id, ct);
 
-        if (account is null)
+        if (!accountExists)
             throw new NotFoundException($"Account with ID {command.Id} was not found.");
 
-        var hasTransactions = await context.Transactions
-            .AnyAsync(t => t.AccountId == command.Id, ct);
+        var hasTransactions = await context.Transactions.AnyAsync(
+            t => t.AccountId == command.Id,
+            ct
+        );
 
         if (hasTransactions)
             throw new ConflictException("Account cannot be deleted because it has transactions.");
 
-        context.Accounts.Remove(account);
-        await context.SaveChangesAsync(ct);
+        await context.Accounts.Where(a => a.Id == command.Id).ExecuteDeleteAsync(ct);
     }
 }
