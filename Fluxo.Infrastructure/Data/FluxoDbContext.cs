@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Infrastructure.Data;
 
-public class FluxoDbContext : DbContext, IFluxoDbContext
+public class FluxoDbContext(DbContextOptions<FluxoDbContext> options)
+    : DbContext(options),
+        IFluxoDbContext
 {
-    public FluxoDbContext(DbContextOptions<FluxoDbContext> options) : base(options) { }
-
     public DbSet<Transaction> Transactions { get; set; } = default!;
     public DbSet<Category> Categories { get; set; } = default!;
     public DbSet<Account> Accounts { get; set; } = default!;
