@@ -11,6 +11,8 @@ namespace Fluxo.Domain.Entities
         public Money Balance { get; private set; } = default!;
         public Currency Currency => Balance.Currency;
 
+        public uint Version { get; private set; }
+
         private Account() { }
 
         public Account(Guid id, string name, decimal balance, string currency)
@@ -30,7 +32,7 @@ namespace Fluxo.Domain.Entities
             {
                 TransactionType.Expense => Balance.Subtract(amount),
                 TransactionType.Income => Balance.Add(amount),
-                _ => throw new DomainException("Transaction type is invalid.")
+                _ => throw new DomainException("Transaction type is invalid."),
             };
         }
 
@@ -40,18 +42,13 @@ namespace Fluxo.Domain.Entities
             {
                 TransactionType.Expense => Balance.Add(amount),
                 TransactionType.Income => Balance.Subtract(amount),
-                _ => throw new DomainException("Transaction type is invalid.")
+                _ => throw new DomainException("Transaction type is invalid."),
             };
         }
 
         public void UpdateName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new DomainException("Account name can't be empty.");
-
-            if (name.Length > 100)
-                throw new DomainException("Account name must not exceed 100 characters.");
-
+            ValidateName(name);
             Name = name.Trim();
         }
 
@@ -60,6 +57,11 @@ namespace Fluxo.Domain.Entities
             if (id == Guid.Empty)
                 throw new DomainException("Account ID is required.");
 
+            ValidateName(name);
+        }
+
+        private static void ValidateName(string name)
+        {
             if (string.IsNullOrWhiteSpace(name))
                 throw new DomainException("Account name can't be empty.");
 

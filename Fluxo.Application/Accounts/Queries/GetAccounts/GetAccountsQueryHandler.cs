@@ -5,16 +5,22 @@ namespace Fluxo.Application.Accounts.Queries.GetAccounts;
 
 public class GetAccountsQueryHandler(IFluxoDbContext context) : IGetAccountsQueryHandler
 {
-    public async Task<IEnumerable<AccountDto>> HandleAsync(GetAccountsQuery query, CancellationToken ct = default)
+    public Task<List<AccountDto>> HandleAsync(
+        GetAccountsQuery query,
+        CancellationToken ct = default
+    )
     {
-        return await context.Accounts
-            .AsNoTracking()
+        return context
+            .Accounts.AsNoTracking()
+            .OrderBy(a => a.Name)
+            .Skip((Math.Max(query.PageNumber, 1) - 1) * query.PageSize)
+            .Take(query.PageSize)
             .Select(a => new AccountDto
             {
                 Id = a.Id,
                 Name = a.Name,
                 Balance = a.Balance.Amount,
-                Currency = a.Balance.Currency.Code
+                Currency = a.Balance.Currency.Code,
             })
             .ToListAsync(ct);
     }
