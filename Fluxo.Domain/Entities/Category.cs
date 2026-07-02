@@ -29,9 +29,7 @@ namespace Fluxo.Domain.Entities
 
         private static string? NormalizeIcon(string? icon)
         {
-            return string.IsNullOrWhiteSpace(icon)
-                ? null
-                : icon.Trim();
+            return string.IsNullOrWhiteSpace(icon) ? null : icon.Trim();
         }
 
         private static void Validate(Guid id, string name, string? icon)

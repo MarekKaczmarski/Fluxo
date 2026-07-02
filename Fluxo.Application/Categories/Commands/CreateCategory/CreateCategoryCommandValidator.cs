@@ -1,30 +1,31 @@
 ﻿using FluentValidation;
 using Fluxo.Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Categories.Commands.CreateCategory
 {
     public class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
     {
-        private readonly IFluxoDbContext _context;
-
-        public CreateCategoryCommandValidator(IFluxoDbContext context)
+        public CreateCategoryCommandValidator(ICategoryUniquenessChecker uniquenessChecker)
         {
-            _context = context;
-
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Category name is required.")
-                .MaximumLength(50).WithMessage("Category name cannot exceed 50 characters.")
-                .MustAsync(BeUniqueName).WithMessage("Category with this name already exists.");
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .WithMessage("Category name is required.")
+                .MaximumLength(50)
+                .WithMessage("Category name cannot exceed 50 characters.")
+                .MustAsync((name, ct) => BeUniqueNameAsync(uniquenessChecker, name, ct))
+                .WithMessage("Category with this name already exists.");
 
-            RuleFor(x => x.Icon)
-                .MaximumLength(50).WithMessage("Icon name is too long.");
+            RuleFor(x => x.Icon).MaximumLength(50).WithMessage("Icon name is too long.");
         }
 
-        private async Task<bool> BeUniqueName(string name, CancellationToken ct)
+        private static async Task<bool> BeUniqueNameAsync(
+            ICategoryUniquenessChecker checker,
+            string name,
+            CancellationToken ct
+        )
         {
-            return !await _context.Categories
-                .AnyAsync(c => c.Name.ToLower() == name.ToLower(), ct);
+            return !await checker.IsNameTakenAsync(name, excludeId: null, ct);
         }
     }
 }

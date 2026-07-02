@@ -1,5 +1,4 @@
 ﻿using Fluxo.Domain.Entities;
-using Fluxo.Infrastructure.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,14 +10,9 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Name)
-            .IsRequired()
-            .HasMaxLength(50);
+        builder.Property(c => c.Name).IsRequired().HasMaxLength(50);
 
-        builder.HasMany<Transaction>()
-            .WithOne(t => t.Category)
-            .HasForeignKey(t => t.CategoryId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(c => c.Name).IsUnique();
 
         //builder.HasData(CategorySeeder.GetSeedData().ToArray());
     }
