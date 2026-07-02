@@ -5,11 +5,14 @@ namespace Fluxo.Application.Transactions.Queries.GetTransactions;
 
 public class GetTransactionsQueryHandler(IFluxoDbContext context) : IGetTransactionsQueryHandler
 {
-    public async Task<IEnumerable<TransactionDto>> HandleAsync(GetTransactionsQuery query, CancellationToken ct)
+    public Task<List<TransactionDto>> HandleAsync(GetTransactionsQuery query, CancellationToken ct)
     {
-        return await context.Transactions
-            .AsNoTracking()
+        return context
+            .Transactions.AsNoTracking()
             .Include(t => t.Category)
+            .OrderByDescending(t => t.Date)
+            .Skip((Math.Max(query.PageNumber, 1) - 1) * query.PageSize)
+            .Take(query.PageSize)
             .Select(t => new TransactionDto
             {
                 Id = t.Id,
@@ -19,7 +22,7 @@ public class GetTransactionsQueryHandler(IFluxoDbContext context) : IGetTransact
                 CategoryId = t.CategoryId,
                 CategoryName = t.Category.Name,
                 Currency = t.Amount.Currency.Code,
-                Type = t.Type
+                Type = t.Type,
             })
             .ToListAsync(ct);
     }

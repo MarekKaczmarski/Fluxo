@@ -8,50 +8,61 @@ namespace Fluxo.Application.Transactions.Commands.UpdateTransaction
 {
     public class UpdateTransactionCommandHandler(
         IFluxoDbContext context,
-        IValidator<UpdateTransactionCommand> validator) : IUpdateTransactionCommandHandler
+        IValidator<UpdateTransactionCommand> validator
+    ) : IUpdateTransactionCommandHandler
     {
         public async Task HandleAsync(UpdateTransactionCommand command, CancellationToken ct)
         {
             var validationResult = await validator.ValidateAsync(command, ct);
-            if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-            var transaction = await context.Transactions
-                .FirstOrDefaultAsync(t => t.Id == command.Id, ct);
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
 
-            if (transaction is null)
-                throw new NotFoundException($"Transaction with ID {command.Id} was not found.");
+            var transaction =
+                await context.Transactions.FirstOrDefaultAsync(t => t.Id == command.Id, ct)
+                ?? throw new NotFoundException($"Transaction with ID {command.Id} was not found.");
 
-            var account = await context.Accounts
-                .FirstOrDefaultAsync(a => a.Id == transaction.AccountId, ct);
+            var account =
+                await context.Accounts.FirstOrDefaultAsync(a => a.Id == transaction.AccountId, ct)
+                ?? throw new NotFoundException(
+                    $"Account with ID {transaction.AccountId} was not found."
+                );
 
-            if (account is null)
-                throw new NotFoundException($"Account with ID {transaction.AccountId} was not found.");
-
-            var categoryExists = await context.Categories
-                .AnyAsync(c => c.Id == command.CategoryId, ct);
+            var categoryExists = await context.Categories.AnyAsync(
+                c => c.Id == command.CategoryId,
+                ct
+            );
 
             if (!categoryExists)
-                throw new NotFoundException($"Category with ID {command.CategoryId} was not found.");
+            {
+                throw new NotFoundException(
+                    $"Category with ID {command.CategoryId} was not found."
+                );
+            }
 
-            var oldCurrency = Currency.FromCode(transaction.Amount.Currency.Code);
-            var oldMoneyForRevert = Money.Positive(transaction.Amount.Amount, oldCurrency);
-            account.RevertTransaction(oldMoneyForRevert, transaction.Type);
+            account.RevertTransaction(transaction.Amount, transaction.Type);
 
-            var newCurrencyForTx = Currency.FromCode(account.Currency.Code);
-            var newMoneyForTx = Money.Positive(command.Amount, newCurrencyForTx);
+            var newAmount = Money.Positive(command.Amount, account.Currency);
 
             transaction.Update(
-                newMoneyForTx,
+                newAmount,
                 command.Description,
                 command.Date,
                 command.CategoryId,
-                command.Type);
+                command.Type
+            );
+            account.ApplyTransaction(newAmount, command.Type);
 
-            var newCurrencyForAccount = Currency.FromCode(account.Currency.Code);
-            var newMoneyForAccount = Money.Positive(command.Amount, newCurrencyForAccount);
-            account.ApplyTransaction(newMoneyForAccount, transaction.Type);
-
-            await context.SaveChangesAsync(ct);
+            try
+            {
+                await context.SaveChangesAsync(ct);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException(
+                    "The account was modified concurrently. Please retry updating the transaction."
+                );
+            }
         }
     }
 }

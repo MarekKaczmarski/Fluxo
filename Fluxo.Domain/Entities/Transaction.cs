@@ -17,7 +17,15 @@ namespace Fluxo.Domain.Entities
 
         private Transaction() { }
 
-        public Transaction(Guid id, Money amount, string description, DateTime date, Guid categoryId, Guid accountId, TransactionType type)
+        public Transaction(
+            Guid id,
+            Money amount,
+            string description,
+            DateTime date,
+            Guid categoryId,
+            Guid accountId,
+            TransactionType type
+        )
         {
             Validate(id, amount, description, date, categoryId, accountId, type);
 
@@ -30,18 +38,32 @@ namespace Fluxo.Domain.Entities
             Type = type;
         }
 
-        public void Update(Money amount, string description, DateTime date, Guid categoryId, TransactionType type)
+        public void Update(
+            Money amount,
+            string description,
+            DateTime date,
+            Guid categoryId,
+            TransactionType type
+        )
         {
             Validate(Id, amount, description, date, categoryId, AccountId, type);
 
-            Amount = amount;
+            Amount = amount.EnsurePositive();
             Description = description.Trim();
             Date = date;
             CategoryId = categoryId;
             Type = type;
         }
 
-        private static void Validate(Guid id, Money amount, string description, DateTime date, Guid categoryId, Guid accountId, TransactionType type)
+        private static void Validate(
+            Guid id,
+            Money amount,
+            string description,
+            DateTime date,
+            Guid categoryId,
+            Guid accountId,
+            TransactionType type
+        )
         {
             if (id == Guid.Empty)
                 throw new DomainException("Transaction ID is required.");

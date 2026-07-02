@@ -2,5 +2,5 @@
 
 public interface IGetTransactionsQueryHandler
 {
-    Task<IEnumerable<TransactionDto>> HandleAsync(GetTransactionsQuery query, CancellationToken ct);
+    Task<List<TransactionDto>> HandleAsync(GetTransactionsQuery query, CancellationToken ct);
 }

@@ -11,39 +11,42 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     {
         builder.HasKey(t => t.Id);
 
-        builder.Property(t => t.Description)
-            .IsRequired()
-            .HasMaxLength(200);
+        builder.Property(t => t.Description).IsRequired().HasMaxLength(200);
 
-        builder.OwnsOne(t => t.Amount, money =>
-        {
-            money.Property(m => m.Amount)
-                .HasColumnName("Amount")
-                .HasPrecision(18, 2)
-                .IsRequired();
+        builder.OwnsOne(
+            t => t.Amount,
+            money =>
+            {
+                money
+                    .Property(m => m.Amount)
+                    .HasColumnName("Amount")
+                    .HasPrecision(18, 2)
+                    .IsRequired();
 
-            money.Property(m => m.Currency)
-                    .HasConversion(
-                        c => c.Code,
-                        code => Currency.FromCode(code)
-                    )
+                money
+                    .Property(m => m.Currency)
+                    .HasConversion(c => c.Code, code => Currency.FromCode(code))
                     .HasColumnName("Currency")
                     .HasMaxLength(3)
                     .IsRequired();
-        });
+            }
+        );
 
         builder.Navigation(t => t.Amount).IsRequired();
 
-        builder.Property(t => t.Date)
-            .IsRequired();
+        builder.Property(t => t.Date).IsRequired();
 
-        builder.HasOne<Account>()
-           .WithMany()
-           .HasForeignKey(t => t.AccountId)
-           .IsRequired()
-           .OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(t => t.Date);
 
-        builder.HasOne(t => t.Category)
+        builder
+            .HasOne<Account>()
+            .WithMany()
+            .HasForeignKey(t => t.AccountId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder
+            .HasOne(t => t.Category)
             .WithMany()
             .HasForeignKey(t => t.CategoryId)
             .IsRequired()
