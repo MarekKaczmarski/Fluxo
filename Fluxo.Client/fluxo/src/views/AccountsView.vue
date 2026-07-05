@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import type { VForm } from 'vuetify/components'
 import { CreditCard, Pencil, Plus, Trash2 } from '@lucide/vue'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { useBudgetStore } from '@/stores/budgetStore'
 import { formatMoney } from '@/lib/formatters'
+import { required } from '@/lib/validation'
 
 const store = useBudgetStore()
-const { accounts, error, isLoading, isSaving, primaryCurrency, totalBalance } = storeToRefs(store)
+const { accounts, error, hasFieldErrors, isLoading, isSaving, primaryCurrency, totalBalance } =
+  storeToRefs(store)
+
+const formRef = ref<VForm | null>(null)
 
 const form = reactive({
   currency: 'PLN',
@@ -45,11 +47,13 @@ function editAccount(accountId: string) {
 }
 
 async function submitForm() {
-  const name = form.name.trim()
+  const { valid } = await formRef.value!.validate()
 
-  if (!name) {
+  if (!valid) {
     return
   }
+
+  const name = form.name.trim()
 
   if (isEditing.value) {
     await store.saveAccount({
@@ -82,69 +86,74 @@ async function removeAccount(accountId: string) {
       <div>
         <h1 class="page-title">Accounts</h1>
       </div>
-      <div class="accounts-total">
+      <div class="accounts-total balance-pill">
         <span>Balance</span>
         <strong>{{ formatMoney(totalBalance, primaryCurrency) }}</strong>
       </div>
     </header>
 
-    <!-- <p v-if="error" class="state-message state-message--error">{{ error.message }}</p> -->
-    <div v-if="error" class="state-message state-message--error">
-      <strong>{{ error.message }}</strong>
-
-      <ul v-if="error.fields" class="mt-2 list-disc pl-4 text-xs">
-        <template v-for="(messages, fieldName) in error.fields" :key="fieldName">
-          <li v-for="(msg, index) in messages" :key="index">
-            {{ msg }}
-          </li>
-        </template>
-      </ul>
-    </div>
+    <v-alert v-if="error && !hasFieldErrors" type="error" variant="tonal">
+      {{ error.message }}
+    </v-alert>
 
     <section class="accounts-layout">
-      <Card>
+      <v-card>
         <v-card-title>{{ isEditing ? 'Edit Account' : 'New Account' }}</v-card-title>
         <v-card-text>
-          <form class="form-grid" @submit.prevent="submitForm">
+          <v-form
+            ref="formRef"
+            class="form-grid"
+            validate-on="submit"
+            novalidate
+            @submit.prevent="submitForm"
+          >
             <div class="field">
               <label for="account-name">Name</label>
-              <Input id="account-name" v-model="form.name" maxlength="100" required />
+              <v-text-field
+                id="account-name"
+                v-model="form.name"
+                maxlength="100"
+                :rules="[required]"
+                :error-messages="store.fieldError('Name')"
+              />
             </div>
             <div class="form-grid form-grid--two">
               <div class="field">
                 <label for="account-balance">Initial Balance</label>
-                <Input
+                <v-text-field
                   id="account-balance"
                   v-model="form.initialBalance"
                   :disabled="isEditing"
                   step="0.01"
                   type="number"
+                  :error-messages="store.fieldError('InitialBalance')"
                 />
               </div>
               <div class="field">
                 <label for="account-currency">Currency</label>
-                <Input
+                <v-text-field
                   id="account-currency"
                   v-model="form.currency"
                   :disabled="isEditing"
                   maxlength="3"
+                  :error-messages="store.fieldError('Currency')"
                 />
               </div>
             </div>
             <div class="form-actions">
-              <Button type="submit" :disabled="isSaving">
+              <v-btn type="submit" color="primary" :disabled="isSaving">
                 <Plus v-if="!isEditing" :size="18" />
                 {{ isSaving ? 'Saving...' : isEditing ? 'Save Name' : 'Add Account' }}
-              </Button>
-              <Button v-if="isEditing" type="button" variant="secondary" @click="resetForm">
+              </v-btn>
+              <v-btn v-if="isEditing" type="button" variant="tonal" @click="resetForm">
                 Cancel
-              </Button>
+              </v-btn>
             </div>
-          </form>
+          </v-form>
         </v-card-text>
-      </Card>
+      </v-card>
 
-      <Card>
+      <v-card>
         <v-card-title>Account List</v-card-title>
         <v-card-subtitle>{{ accounts.length }} positions</v-card-subtitle>
         <v-card-text>
@@ -160,54 +169,38 @@ async function removeAccount(accountId: string) {
               </div>
               <strong>{{ formatMoney(account.balance, account.currency) }}</strong>
               <div class="account-list__actions">
-                <Button
-                  size="icon"
-                  variant="ghost"
+                <v-btn
+                  icon
+                  size="small"
+                  variant="text"
                   type="button"
                   aria-label="Edit"
                   @click="editAccount(account.id)"
                 >
                   <Pencil :size="18" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
+                </v-btn>
+                <v-btn
+                  icon
+                  size="small"
+                  variant="text"
                   type="button"
                   aria-label="Delete"
                   @click="removeAccount(account.id)"
                 >
                   <Trash2 :size="18" />
-                </Button>
+                </v-btn>
               </div>
             </li>
           </ul>
         </v-card-text>
-      </Card>
+      </v-card>
     </section>
   </main>
 </template>
 
 <style scoped>
-.entity-view {
-  margin: 0 auto;
-  max-width: 66rem;
-  min-height: 100vh;
-  padding: 2rem clamp(1rem, 4vw, 2rem) 7.75rem;
-}
-
-.entity-view__header {
-  align-items: end;
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
-}
-
 .accounts-total {
   align-items: end;
-  background: var(--color-primary);
-  border-radius: var(--radius-md);
-  color: white;
   display: grid;
   min-width: 12rem;
   padding: 0.8rem 1rem;
@@ -226,24 +219,6 @@ async function removeAccount(accountId: string) {
   display: grid;
   gap: 1rem;
   grid-template-columns: minmax(18rem, 0.75fr) minmax(0, 1.25fr);
-}
-
-.form-grid--two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.account-list {
-  display: grid;
-  gap: 0.65rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .account-list__item {

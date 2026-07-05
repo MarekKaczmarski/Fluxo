@@ -2,22 +2,22 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
+import type { VForm } from 'vuetify/components'
 import { ArrowDownCircle, ArrowUpCircle, Pencil, Plus, Trash2 } from '@lucide/vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import CategoryIcon from '@/components/CategoryIcon.vue'
 import { TransactionType, type TransactionDto } from '@/api/models'
 import { useBudgetStore } from '@/stores/budgetStore'
 import { formatDate, toDateInputValue } from '@/lib/dates'
 import { formatMoney } from '@/lib/formatters'
 import { categoryColors } from '@/lib/categoryIcons'
+import { required, positiveAmount } from '@/lib/validation'
 
 const route = useRoute()
 const store = useBudgetStore()
-const { accounts, categories, error, isLoading, isSaving, transactions } = storeToRefs(store)
+const { accounts, categories, error, hasFieldErrors, isLoading, isSaving, transactions } =
+  storeToRefs(store)
+
+const formRef = ref<VForm | null>(null)
 
 type FilterType = 'all' | 'expense' | 'income'
 
@@ -115,11 +115,13 @@ function toApiDate(date: string) {
 }
 
 async function submitForm() {
-  const amount = Number(form.amount)
+  const { valid } = await formRef.value!.validate()
 
-  if (!Number.isFinite(amount) || amount <= 0 || !form.categoryId) {
+  if (!valid) {
     return
   }
+
+  const amount = Number(form.amount)
 
   if (isEditing.value) {
     await store.saveTransaction({
@@ -130,7 +132,7 @@ async function submitForm() {
       id: form.id,
       type: form.type,
     })
-  } else if (form.accountId) {
+  } else {
     await store.addTransaction({
       accountId: form.accountId,
       amount,
@@ -164,24 +166,21 @@ function categoryColor(categoryId: string) {
       </div>
     </header>
 
-    <!-- <p v-if="error" class="state-message state-message--error">{{ error.message }}</p> -->
-    <div v-if="error" class="state-message state-message--error">
-      <strong>{{ error.message }}</strong>
-
-      <ul v-if="error.fields" class="mt-2 list-disc pl-4 text-xs">
-        <template v-for="(messages, fieldName) in error.fields" :key="fieldName">
-          <li v-for="(msg, index) in messages" :key="index">
-            {{ msg }}
-          </li>
-        </template>
-      </ul>
-    </div>
+    <v-alert v-if="error && !hasFieldErrors" type="error" variant="tonal">
+      {{ error.message }}
+    </v-alert>
 
     <section class="transactions-layout">
-      <Card>
+      <v-card>
         <v-card-title>{{ isEditing ? 'Edit Transaction' : 'New Transaction' }}</v-card-title>
         <v-card-text>
-          <form class="form-grid" @submit.prevent="submitForm">
+          <v-form
+            ref="formRef"
+            class="form-grid"
+            validate-on="submit"
+            novalidate
+            @submit.prevent="submitForm"
+          >
             <div class="transaction-type-toggle" role="group" aria-label="Transaction Type">
               <button
                 type="button"
@@ -207,68 +206,85 @@ function categoryColor(categoryId: string) {
 
             <div class="field">
               <label for="transaction-description">Description</label>
-              <Input id="transaction-description" v-model="form.description" required />
+              <v-text-field
+                id="transaction-description"
+                v-model="form.description"
+                :rules="[required]"
+                :error-messages="store.fieldError('Description')"
+              />
             </div>
 
             <div class="transaction-form__amount-date-group">
               <div class="field">
                 <label for="transaction-amount">Amount</label>
-                <Input
+                <v-text-field
                   id="transaction-amount"
                   v-model="form.amount"
-                  min="0.01"
                   step="0.01"
                   type="number"
-                  required
+                  :rules="[required, positiveAmount]"
+                  :error-messages="store.fieldError('Amount')"
                 />
               </div>
               <div class="field">
                 <label for="transaction-date">Date</label>
-                <Input id="transaction-date" v-model="form.date" type="date" required />
+                <v-text-field
+                  id="transaction-date"
+                  v-model="form.date"
+                  type="date"
+                  append-inner-icon="mdi-calendar"
+                  :rules="[required]"
+                  :error-messages="store.fieldError('Date')"
+                />
               </div>
             </div>
 
             <div class="form-grid form-grid--two">
               <div class="field">
                 <label for="transaction-category">Category</label>
-                <Select id="transaction-category" v-model="form.categoryId" required>
-                  <option v-for="category in categories" :key="category.id" :value="category.id">
-                    {{ category.name }}
-                  </option>
-                </Select>
+                <v-select
+                  id="transaction-category"
+                  v-model="form.categoryId"
+                  :items="categories"
+                  item-title="name"
+                  item-value="id"
+                  :rules="[required]"
+                  :error-messages="store.fieldError('CategoryId')"
+                />
               </div>
               <div class="field">
                 <label for="transaction-account">Account</label>
-                <Select
+                <v-select
                   id="transaction-account"
                   v-model="form.accountId"
+                  :items="accounts"
+                  item-title="name"
+                  item-value="id"
                   :disabled="isEditing"
-                  required
-                >
-                  <option v-for="account in accounts" :key="account.id" :value="account.id">
-                    {{ account.name }}
-                  </option>
-                </Select>
+                  :rules="[required]"
+                  :error-messages="store.fieldError('AccountId')"
+                />
               </div>
             </div>
 
             <div class="form-actions">
-              <Button
+              <v-btn
                 type="submit"
+                color="primary"
                 :disabled="isSaving || categories.length === 0 || accounts.length === 0"
               >
                 <Plus v-if="!isEditing" :size="18" />
                 {{ isSaving ? 'Saving...' : isEditing ? 'Save Changes' : 'Add Transaction' }}
-              </Button>
-              <Button v-if="isEditing" type="button" variant="secondary" @click="resetForm">
+              </v-btn>
+              <v-btn v-if="isEditing" type="button" variant="tonal" @click="resetForm">
                 Cancel
-              </Button>
+              </v-btn>
             </div>
-          </form>
+          </v-form>
         </v-card-text>
-      </Card>
+      </v-card>
 
-      <Card>
+      <v-card>
         <v-card-title>Transaction List</v-card-title>
         <v-card-subtitle>{{ visibleTransactions.length }} positions</v-card-subtitle>
         <v-card-text>
@@ -317,11 +333,12 @@ function categoryColor(categoryId: string) {
                 <span>{{ transaction.categoryName }} · {{ formatDate(transaction.date) }}</span>
               </div>
               <div class="transaction-list__amount">
-                <Badge
-                  :variant="transaction.type === TransactionType.Income ? 'income' : 'expense'"
+                <v-chip
+                  :color="transaction.type === TransactionType.Income ? 'success' : 'error'"
+                  size="small"
                 >
                   {{ transaction.type === TransactionType.Income ? 'Income' : 'Expense' }}
-                </Badge>
+                </v-chip>
                 <strong
                   :class="
                     transaction.type === TransactionType.Income ? 'amount-income' : 'amount-expense'
@@ -332,62 +349,44 @@ function categoryColor(categoryId: string) {
                 </strong>
               </div>
               <div class="transaction-list__actions">
-                <Button
-                  size="icon"
-                  variant="ghost"
+                <v-btn
+                  icon
+                  size="small"
+                  variant="text"
                   type="button"
                   aria-label="Edit"
                   @click="editTransaction(transaction)"
                 >
                   <Pencil :size="18" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
+                </v-btn>
+                <v-btn
+                  icon
+                  size="small"
+                  variant="text"
                   type="button"
                   aria-label="Delete"
                   @click="removeTransaction(transaction)"
                 >
                   <Trash2 :size="18" />
-                </Button>
+                </v-btn>
               </div>
             </li>
           </ul>
         </v-card-text>
-      </Card>
+      </v-card>
     </section>
   </main>
 </template>
 
 <style scoped>
 .entity-view {
-  margin: 0 auto;
   max-width: 74rem;
-  min-height: 100vh;
-  padding: 2rem clamp(1rem, 4vw, 2rem) 7.75rem;
-}
-
-.entity-view__header {
-  align-items: end;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
 }
 
 .transactions-layout {
   display: grid;
   gap: 1rem;
   grid-template-columns: minmax(19rem, 0.8fr) minmax(0, 1.2fr);
-}
-
-.form-grid--two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
 }
 
 .transaction-type-toggle,
@@ -425,19 +424,11 @@ function categoryColor(categoryId: string) {
   min-height: 2.3rem;
 }
 
-.transaction-type-toggle__button--active,
-.filter-tabs__button--active {
-  background: white !important;
+.transaction-type-toggle button.transaction-type-toggle__button--active,
+.filter-tabs button.filter-tabs__button--active {
+  background: white;
   box-shadow: 0 6px 16px rgb(0 0 0 / 8%);
-  color: var(--color-primary-strong) !important;
-}
-
-.transaction-list {
-  display: grid;
-  gap: 0.6rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  color: var(--color-primary-strong);
 }
 
 .transaction-list__item {
@@ -488,6 +479,19 @@ function categoryColor(categoryId: string) {
   z-index: 2;
 }
 
+:deep(input[type='date']::-webkit-calendar-picker-indicator) {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
 @media (max-width: 860px) {
   .transactions-layout {
     grid-template-columns: 1fr;
@@ -495,37 +499,25 @@ function categoryColor(categoryId: string) {
 }
 
 @media (max-width: 620px) {
-  .transaction-form__row--multi {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.75rem !important;
-  }
-
   .transaction-form__amount-date-group {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    gap: 0.75rem !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.75rem;
   }
 
-  .transaction-form__input,
-  .transaction-form__amount-date-group input {
-    min-width: 0 !important;
-    max-width: 100% !important;
+  .transaction-form__amount-date-group > .field {
+    min-width: 0;
+    max-width: 100%;
   }
 
-  .transaction-form__amount-date-group input[type='number'] {
-    flex: 1 1 auto !important;
+  .transaction-form__amount-date-group > .field:first-child {
+    flex: 1 1 auto;
   }
 
-  .transaction-form__amount-date-group input[type='date'] {
-    flex: 0 0 auto !important;
-    text-align: right !important;
-  }
-
-  :deep(.transaction-form__row--multi button[role='combobox']) {
-    width: 100% !important;
+  .transaction-form__amount-date-group > .field:last-child {
+    flex: 0 0 auto;
   }
 }
 </style>

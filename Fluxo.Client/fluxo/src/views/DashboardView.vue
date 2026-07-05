@@ -2,7 +2,6 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ChevronLeft, ChevronRight, Minus, Plus } from '@lucide/vue'
-import { Button } from '@/components/ui/button'
 import SpendingOrbit, { type OrbitItem } from '@/components/SpendingOrbit.vue'
 import { TransactionType } from '@/api/models'
 import { useBudgetStore } from '@/stores/budgetStore'
@@ -11,8 +10,15 @@ import { categoryColors } from '@/lib/categoryIcons'
 import { formatMoney } from '@/lib/formatters'
 
 const store = useBudgetStore()
-const { categories, error, isLoading, primaryCurrency, totalBalance, transactions } =
-  storeToRefs(store)
+const {
+  categories,
+  error,
+  hasFieldErrors,
+  isLoading,
+  primaryCurrency,
+  totalBalance,
+  transactions,
+} = storeToRefs(store)
 
 const selectedMonth = ref(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
 const hasAutoSelectedMonth = ref(false)
@@ -150,18 +156,9 @@ function changeMonth(amount: number) {
       </button>
     </section>
 
-    <!-- <p v-if="error" class="state-message state-message--error">{{ error.message }}</p> -->
-    <div v-if="error" class="state-message state-message--error">
-      <strong>{{ error.message }}</strong>
-
-      <ul v-if="error.fields" class="mt-2 list-disc pl-4 text-xs">
-        <template v-for="(messages, fieldName) in error.fields" :key="fieldName">
-          <li v-for="(msg, index) in messages" :key="index">
-            {{ msg }}
-          </li>
-        </template>
-      </ul>
-    </div>
+    <v-alert v-if="error && !hasFieldErrors" type="error" variant="tonal">
+      {{ error.message }}
+    </v-alert>
     <p v-else-if="isLoading && transactions.length === 0" class="state-message">Loading data...</p>
 
     <SpendingOrbit
@@ -172,42 +169,38 @@ function changeMonth(amount: number) {
     />
 
     <section class="dashboard-view__summary" aria-label="Account summary">
-      <Button
-        class="dashboard-view__balance"
-        variant="balance"
-        size="lg"
-        as="RouterLink"
-        to="/accounts"
-      >
+      <v-btn class="dashboard-view__balance balance-pill" size="large" :to="'/accounts'">
         <span>Balance</span>
         <strong>{{ formatMoney(totalBalance, primaryCurrency) }}</strong>
-      </Button>
+      </v-btn>
     </section>
 
     <section class="dashboard-view__actions" aria-label="Quick adding actions">
       <div class="dashboard-view__action">
-        <Button
-          size="action"
-          variant="expense"
-          as="RouterLink"
+        <v-btn
+          class="dashboard-view__action-button"
+          icon
+          color="error"
+          variant="tonal"
           :to="{ path: '/transactions', query: { type: 'expense' } }"
           aria-label="Add expense"
         >
           <Minus :size="42" />
-        </Button>
+        </v-btn>
         <span>Expense</span>
       </div>
 
       <div class="dashboard-view__action">
-        <Button
-          size="action"
-          variant="income"
-          as="RouterLink"
+        <v-btn
+          class="dashboard-view__action-button"
+          icon
+          color="success"
+          variant="tonal"
           :to="{ path: '/transactions', query: { type: 'income' } }"
           aria-label="Add income"
         >
           <Plus :size="42" />
-        </Button>
+        </v-btn>
         <span>Income</span>
       </div>
     </section>
@@ -231,11 +224,6 @@ function changeMonth(amount: number) {
   padding: calc(env(safe-area-inset-top) + 1rem) clamp(1rem, 4vw, 2rem) 0.9rem;
 }
 
-.dashboard-view__topbar-button,
-.dashboard-view__tools :deep(.ui-button) {
-  color: white;
-}
-
 .dashboard-view__brand {
   min-width: 0;
 }
@@ -254,11 +242,6 @@ function changeMonth(amount: number) {
   font-size: 1rem;
   line-height: 1.2;
   opacity: 0.88;
-}
-
-.dashboard-view__tools {
-  display: flex;
-  gap: 0.2rem;
 }
 
 .dashboard-view__month {
@@ -316,15 +299,13 @@ function changeMonth(amount: number) {
   padding: 0 clamp(1rem, 5vw, 2rem);
 }
 
-.dashboard-view__menu-button {
-  color: color-mix(in srgb, var(--color-primary-strong) 74%, transparent);
-  justify-self: center;
-}
-
 .dashboard-view__balance {
-  border-radius: var(--radius-sm);
   font-size: clamp(1.25rem, 5vw, 2.1rem);
   min-width: min(76vw, 24rem);
+}
+
+.dashboard-view__balance :deep(.v-btn__content) {
+  gap: 0.5rem;
 }
 
 .dashboard-view__balance span {
@@ -351,20 +332,17 @@ function changeMonth(amount: number) {
   gap: 0.5rem;
 }
 
+.dashboard-view__action-button {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  font-size: 2.6rem;
+  height: clamp(5.5rem, 24vw, 8.25rem);
+  width: clamp(5.5rem, 24vw, 8.25rem);
+}
+
 .dashboard-view__action span {
   color: var(--color-muted-foreground);
   font-size: 0.8rem;
   font-weight: 700;
-}
-
-@media (max-width: 560px) {
-  .dashboard-view__tools {
-    gap: 0;
-  }
-
-  .dashboard-view__tools :deep(.ui-button) {
-    height: 2.25rem;
-    width: 2.25rem;
-  }
 }
 </style>

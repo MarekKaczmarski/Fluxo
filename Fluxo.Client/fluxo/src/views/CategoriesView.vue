@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import type { VForm } from 'vuetify/components'
 import { ChevronDown, Pencil, Plus, Trash2 } from '@lucide/vue'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import CategoryIcon from '@/components/CategoryIcon.vue'
 import { useBudgetStore } from '@/stores/budgetStore'
 import { categoryColors } from '@/lib/categoryIcons'
 import { TransactionType } from '@/api/models'
 import { formatMoney } from '@/lib/formatters'
+import { required } from '@/lib/validation'
 
 const store = useBudgetStore()
-const { categories, error, isLoading, isSaving, primaryCurrency, transactions } = storeToRefs(store)
+const { categories, error, hasFieldErrors, isLoading, isSaving, primaryCurrency, transactions } =
+  storeToRefs(store)
+
+const formRef = ref<VForm | null>(null)
 
 const iconOptions = [
   'balance',
@@ -94,13 +95,15 @@ function editCategory(categoryId: string) {
 }
 
 async function submitForm() {
+  const { valid } = await formRef.value!.validate()
+
+  if (!valid) {
+    return
+  }
+
   const payload = {
     icon: form.icon || null,
     name: form.name.trim(),
-  }
-
-  if (!payload.name) {
-    return
   }
 
   if (isEditing.value) {
@@ -129,54 +132,58 @@ async function removeCategory(categoryId: string) {
       </div>
     </header>
 
-    <!-- <p v-if="error" class="state-message state-message--error">{{ error.message }}</p> -->
-    <div v-if="error" class="state-message state-message--error">
-      <strong>{{ error.message }}</strong>
-
-      <ul v-if="error.fields" class="mt-2 list-disc pl-4 text-xs">
-        <template v-for="(messages, fieldName) in error.fields" :key="fieldName">
-          <li v-for="(msg, index) in messages" :key="index">
-            {{ msg }}
-          </li>
-        </template>
-      </ul>
-    </div>
+    <v-alert v-if="error && !hasFieldErrors" type="error" variant="tonal">
+      {{ error.message }}
+    </v-alert>
 
     <section class="categories-layout">
-      <Card>
+      <v-card>
         <v-card-title>{{ isEditing ? 'Edit Category' : 'New Category' }}</v-card-title>
         <v-card-text>
-          <form class="form-grid" @submit.prevent="submitForm">
+          <v-form
+            ref="formRef"
+            class="form-grid"
+            validate-on="submit"
+            novalidate
+            @submit.prevent="submitForm"
+          >
             <div class="field">
               <label for="category-name">Name</label>
-              <Input id="category-name" v-model="form.name" maxlength="50" required />
+              <v-text-field
+                id="category-name"
+                v-model="form.name"
+                maxlength="50"
+                :rules="[required]"
+                :error-messages="store.fieldError('Name')"
+              />
             </div>
             <div class="field">
               <label for="category-icon">Icon</label>
-              <Select id="category-icon" v-model="form.icon">
-                <option v-for="icon in iconOptions" :key="icon" :value="icon">
-                  {{ icon }}
-                </option>
-              </Select>
+              <v-select
+                id="category-icon"
+                v-model="form.icon"
+                :items="iconOptions"
+                :error-messages="store.fieldError('Icon')"
+              />
             </div>
             <div class="category-preview">
               <CategoryIcon :icon="form.icon" :color="categoryColors[1]" :size="38" />
               <strong>{{ form.name || 'Category' }}</strong>
             </div>
             <div class="form-actions">
-              <Button type="submit" :disabled="isSaving">
+              <v-btn type="submit" color="primary" :disabled="isSaving">
                 <Plus v-if="!isEditing" :size="18" />
                 {{ isSaving ? 'Saving...' : isEditing ? 'Save Changes' : 'Add Category' }}
-              </Button>
-              <Button v-if="isEditing" type="button" variant="secondary" @click="resetForm">
+              </v-btn>
+              <v-btn v-if="isEditing" type="button" variant="tonal" @click="resetForm">
                 Cancel
-              </Button>
+              </v-btn>
             </div>
-          </form>
+          </v-form>
         </v-card-text>
-      </Card>
+      </v-card>
 
-      <Card>
+      <v-card>
         <v-card-title>Category List</v-card-title>
         <v-card-subtitle>{{ categories.length }} positions</v-card-subtitle>
         <v-card-text>
@@ -213,24 +220,26 @@ async function removeCategory(categoryId: string) {
                 </button>
 
                 <div class="category-list__actions">
-                  <Button
-                    size="icon"
-                    variant="ghost"
+                  <v-btn
+                    icon
+                    size="small"
+                    variant="text"
                     type="button"
                     aria-label="Edit"
                     @click="editCategory(category.id)"
                   >
                     <Pencil :size="18" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
+                  </v-btn>
+                  <v-btn
+                    icon
+                    size="small"
+                    variant="text"
                     type="button"
                     aria-label="Delete"
                     @click="removeCategory(category.id)"
                   >
                     <Trash2 :size="18" />
-                  </Button>
+                  </v-btn>
                 </div>
               </div>
 
@@ -256,8 +265,8 @@ async function removeCategory(categoryId: string) {
                       class="category-list__transaction-amount"
                       :class="
                         transaction.type === TransactionType.Income
-                          ? 'category-list__transaction-amount--income'
-                          : 'category-list__transaction-amount--expense'
+                          ? 'amount-income'
+                          : 'amount-expense'
                       "
                     >
                       {{ transaction.type === TransactionType.Income ? '+' : '-'
@@ -269,33 +278,16 @@ async function removeCategory(categoryId: string) {
             </li>
           </ul>
         </v-card-text>
-      </Card>
+      </v-card>
     </section>
   </main>
 </template>
 
 <style scoped>
-.entity-view {
-  margin: 0 auto;
-  max-width: 66rem;
-  min-height: 100vh;
-  padding: 2rem clamp(1rem, 4vw, 2rem) 7.75rem;
-}
-
-.entity-view__header {
-  margin-bottom: 1.25rem;
-}
-
 .categories-layout {
   display: grid;
   gap: 1rem;
   grid-template-columns: minmax(18rem, 0.75fr) minmax(0, 1.25fr);
-}
-
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
 }
 
 .category-preview {
@@ -306,14 +298,6 @@ async function removeCategory(categoryId: string) {
   display: flex;
   gap: 0.75rem;
   padding: 0.85rem;
-}
-
-.category-list {
-  display: grid;
-  gap: 0.65rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .category-list__item {
@@ -414,15 +398,7 @@ async function removeCategory(categoryId: string) {
   white-space: nowrap;
 }
 
-.category-list__transaction-amount--income {
-  color: var(--color-income);
-}
-
-.category-list__transaction-amount--expense {
-  color: var(--color-expense);
-}
-
-@media (max-width: 760px) {
+@media (max-width: 780px) {
   .categories-layout,
   .category-list__row {
     grid-template-columns: 1fr;
