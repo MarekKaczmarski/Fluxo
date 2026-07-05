@@ -45,5 +45,19 @@ export default createVuetify({
     VBtn: {
       rounded: 'lg',
     },
+    VChip: {
+      rounded: 'lg',
+      variant: 'tonal',
+    },
+    VTextField: {
+      variant: 'outlined',
+      density: 'compact',
+      hideDetails: 'auto',
+    },
+    VSelect: {
+      variant: 'outlined',
+      density: 'compact',
+      hideDetails: 'auto',
+    },
   },
 })
