@@ -1,12 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { ApiError } from '@/api/apiClient'
-import { 
-  createAccount, 
-  deleteAccount, 
-  getAccounts, 
-  updateAccount,
-} from '@/api/accountService'
+import { createAccount, deleteAccount, getAccounts, updateAccount } from '@/api/accountService'
 
 import {
   createCategory,
@@ -54,6 +49,12 @@ export const useBudgetStore = defineStore('budget', () => {
   const primaryCurrency = computed(
     () => accounts.value[0]?.currency ?? transactions.value[0]?.currency ?? 'PLN',
   )
+
+  const hasFieldErrors = computed(() => Object.keys(error.value?.fields ?? {}).length > 0)
+
+  function fieldError(field: string): string[] {
+    return error.value?.fields[field] ?? []
+  }
 
   async function runSaving(task: () => Promise<void>) {
     isSaving.value = true
@@ -172,6 +173,8 @@ export const useBudgetStore = defineStore('budget', () => {
     error,
     totalBalance,
     primaryCurrency,
+    hasFieldErrors,
+    fieldError,
     fetchAll,
     addTransaction,
     saveTransaction,
