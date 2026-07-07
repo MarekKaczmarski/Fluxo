@@ -1,4 +1,4 @@
-﻿using Fluxo.Domain.Enums;
+using Fluxo.Domain.Enums;
 
 namespace Fluxo.Application.Transactions.Commands.UpdateTransaction;
 
@@ -8,4 +8,6 @@ public record UpdateTransactionCommand(
     decimal Amount,
     DateTime Date,
     Guid CategoryId,
-    TransactionType Type);
+    Guid AccountId,
+    TransactionType Type
+);

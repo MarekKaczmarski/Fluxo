@@ -1,7 +1,6 @@
-﻿namespace Fluxo.Application.Transactions.Commands.DeleteTransaction
+namespace Fluxo.Application.Transactions.Commands.DeleteTransaction;
+
+public interface IDeleteTransactionCommandHandler
 {
-    public interface IDeleteTransactionCommandHandler
-    {
-        Task HandleAsync(DeleteTransactionCommand command, CancellationToken ct);
-    }
+    Task HandleAsync(DeleteTransactionCommand command, CancellationToken ct);
 }

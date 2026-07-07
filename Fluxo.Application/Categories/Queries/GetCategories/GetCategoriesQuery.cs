@@ -1,4 +1,3 @@
-﻿namespace Fluxo.Application.Categories.Queries.GetCategories
-{
-    public record GetCategoriesQuery;
-}
+namespace Fluxo.Application.Categories.Queries.GetCategories;
+
+public record GetCategoriesQuery;

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 
-namespace Fluxo.Application.Transactions.Commands.CreateTransaction
+public interface ICreateTransactionCommandHandler
 {
-    public interface ICreateTransactionCommandHandler
-    {
-        Task<Guid> HandleAsync(CreateTransactionCommand command, CancellationToken ct);
-    }
+    Task<Guid> HandleAsync(CreateTransactionCommand command, CancellationToken ct);
 }

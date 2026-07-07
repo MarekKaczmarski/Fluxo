@@ -2,71 +2,70 @@ using Fluxo.Domain.Enums;
 using Fluxo.Domain.Exceptions;
 using Fluxo.Domain.ValueObjects;
 
-namespace Fluxo.Domain.Entities
+namespace Fluxo.Domain.Entities;
+
+public class Account
 {
-    public class Account
+    public Guid Id { get; private set; }
+    public string Name { get; private set; } = default!;
+    public Money Balance { get; private set; } = default!;
+    public Currency Currency => Balance.Currency;
+
+    public uint Version { get; private set; }
+
+    private Account() { }
+
+    public Account(Guid id, string name, decimal balance, string currency)
     {
-        public Guid Id { get; private set; }
-        public string Name { get; private set; } = default!;
-        public Money Balance { get; private set; } = default!;
-        public Currency Currency => Balance.Currency;
+        Validate(id, name);
 
-        public uint Version { get; private set; }
+        var accountCurrency = Currency.FromCode(currency);
 
-        private Account() { }
+        Id = id;
+        Name = name.Trim();
+        Balance = new Money(balance, accountCurrency);
+    }
 
-        public Account(Guid id, string name, decimal balance, string currency)
+    public void ApplyTransaction(Money amount, TransactionType type)
+    {
+        Balance = type switch
         {
-            Validate(id, name);
+            TransactionType.Expense => Balance.Subtract(amount),
+            TransactionType.Income => Balance.Add(amount),
+            _ => throw new DomainException("Transaction type is invalid."),
+        };
+    }
 
-            var accountCurrency = Currency.FromCode(currency);
-
-            Id = id;
-            Name = name.Trim();
-            Balance = new Money(balance, accountCurrency);
-        }
-
-        public void ApplyTransaction(Money amount, TransactionType type)
+    public void RevertTransaction(Money amount, TransactionType type)
+    {
+        Balance = type switch
         {
-            Balance = type switch
-            {
-                TransactionType.Expense => Balance.Subtract(amount),
-                TransactionType.Income => Balance.Add(amount),
-                _ => throw new DomainException("Transaction type is invalid."),
-            };
-        }
+            TransactionType.Expense => Balance.Add(amount),
+            TransactionType.Income => Balance.Subtract(amount),
+            _ => throw new DomainException("Transaction type is invalid."),
+        };
+    }
 
-        public void RevertTransaction(Money amount, TransactionType type)
-        {
-            Balance = type switch
-            {
-                TransactionType.Expense => Balance.Add(amount),
-                TransactionType.Income => Balance.Subtract(amount),
-                _ => throw new DomainException("Transaction type is invalid."),
-            };
-        }
+    public void UpdateName(string name)
+    {
+        ValidateName(name);
+        Name = name.Trim();
+    }
 
-        public void UpdateName(string name)
-        {
-            ValidateName(name);
-            Name = name.Trim();
-        }
+    private static void Validate(Guid id, string name)
+    {
+        if (id == Guid.Empty)
+            throw new DomainException("Account ID is required.");
 
-        private static void Validate(Guid id, string name)
-        {
-            if (id == Guid.Empty)
-                throw new DomainException("Account ID is required.");
+        ValidateName(name);
+    }
 
-            ValidateName(name);
-        }
+    private static void ValidateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException("Account name can't be empty.");
 
-        private static void ValidateName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new DomainException("Account name can't be empty.");
-
-            if (name.Length > 100)
-                throw new DomainException("Account name must not exceed 100 characters.");
-        }
+        if (name.Length > 100)
+            throw new DomainException("Account name must not exceed 100 characters.");
     }
 }

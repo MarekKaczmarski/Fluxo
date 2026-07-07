@@ -1,7 +1,6 @@
-﻿namespace Fluxo.Application.Categories.Commands.CreateCategory
+namespace Fluxo.Application.Categories.Commands.CreateCategory;
+
+public interface ICreateCategoryCommandHandler
 {
-    public interface ICreateCategoryCommandHandler
-    {
-        Task<Guid> HandleAsync(CreateCategoryCommand command, CancellationToken ct);
-    }
+    Task<Guid> HandleAsync(CreateCategoryCommand command, CancellationToken ct);
 }

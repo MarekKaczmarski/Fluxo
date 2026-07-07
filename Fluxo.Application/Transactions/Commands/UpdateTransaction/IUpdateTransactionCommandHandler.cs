@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+namespace Fluxo.Application.Transactions.Commands.UpdateTransaction;
 
-namespace Fluxo.Application.Transactions.Commands.UpdateTransaction
+public interface IUpdateTransactionCommandHandler
 {
-    public interface IUpdateTransactionCommandHandler
-    {
-        Task HandleAsync(UpdateTransactionCommand command, CancellationToken ct);
-    }
+    Task HandleAsync(UpdateTransactionCommand command, CancellationToken ct);
 }

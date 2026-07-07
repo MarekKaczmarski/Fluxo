@@ -1,7 +1,6 @@
-namespace Fluxo.Application.Common.Interfaces
+namespace Fluxo.Application.Common.Interfaces;
+
+public interface IAccountUniquenessChecker
 {
-    public interface IAccountUniquenessChecker
-    {
-        Task<bool> IsNameTakenAsync(string name, Guid? excludeId, CancellationToken ct);
-    }
+    Task<bool> IsNameTakenAsync(string name, Guid? excludeId, CancellationToken ct);
 }

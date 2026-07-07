@@ -1,4 +1,4 @@
-﻿using Fluxo.Domain.Enums;
+using Fluxo.Domain.Enums;
 
 namespace Fluxo.Application.Transactions.Commands.CreateTransaction;
 
@@ -8,4 +8,5 @@ public record CreateTransactionCommand(
     DateTime Date,
     Guid CategoryId,
     Guid AccountId,
-    TransactionType Type);
+    TransactionType Type
+);
