@@ -1,17 +1,27 @@
+using FluentValidation;
 using Fluxo.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Transactions.Queries.GetTransactions;
 
-public class GetTransactionsQueryHandler(IFluxoDbContext context) : IGetTransactionsQueryHandler
+public class GetTransactionsQueryHandler(
+    IFluxoDbContext context,
+    IValidator<GetTransactionsQuery> validator
+) : IGetTransactionsQueryHandler
 {
-    public Task<List<TransactionDto>> HandleAsync(GetTransactionsQuery query, CancellationToken ct)
+    public async Task<List<TransactionDto>> HandleAsync(
+        GetTransactionsQuery query,
+        CancellationToken ct
+    )
     {
-        return context
+        var validationResult = await validator.ValidateAsync(query, ct);
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
+        return await context
             .Transactions.AsNoTracking()
-            .Include(t => t.Category)
             .OrderByDescending(t => t.Date)
-            .Skip((Math.Max(query.PageNumber, 1) - 1) * query.PageSize)
+            .Skip((query.PageNumber - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(t => new TransactionDto
             {
