@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+using FluentValidation;
+using Fluxo.Application.Common;
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Application.Exceptions;
 using Fluxo.Domain.Entities;
@@ -25,17 +26,11 @@ public class CreateCategoryCommandHandler(
         {
             await context.SaveChangesAsync(ct);
         }
-        catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
+        catch (DbUpdateException ex) when (PostgresConstraintHelper.IsUniqueViolation(ex))
         {
             throw new ConflictException($"Category with name '{command.Name}' already exists.");
         }
 
         return category.Id;
     }
-
-    private static bool IsUniqueConstraintViolation(DbUpdateException ex) =>
-        ex.InnerException?.Message.Contains(
-            "IX_Categories_Name",
-            StringComparison.OrdinalIgnoreCase
-        ) ?? false;
 }
