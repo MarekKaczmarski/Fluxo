@@ -1,11 +1,13 @@
 using FluentValidation;
 using Fluxo.Api.Exceptions;
+using Fluxo.Application.Accounts.Commands.CreateAccount;
 using Fluxo.Application.Accounts.Common;
 using Fluxo.Application.Categories.Common;
 using Fluxo.Application.Common.Interfaces;
 using Fluxo.Application.Transactions.Commands.CreateTransaction;
 using Fluxo.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
@@ -67,6 +69,8 @@ try
 
     builder.Services.AddScoped<IAccountUniquenessChecker, AccountUniquenessChecker>();
     builder.Services.AddScoped<ICategoryUniquenessChecker, CategoryUniquenessChecker>();
+    builder.Services.AddScoped<IAccountExistenceChecker, AccountExistenceChecker>();
+    builder.Services.AddScoped<ICategoryExistenceChecker, CategoryExistenceChecker>();
 
     builder.Services.AddValidatorsFromAssemblyContaining<CreateTransactionCommandValidator>();
 
@@ -122,7 +126,7 @@ try
 
     app.Run();
 }
-catch (Exception ex) when (ex.GetType().Name is not "HostAbortedException")
+catch (Exception ex) when (ex is not HostAbortedException)
 {
     Log.Fatal(ex, "Application start-up failed");
     exitCode = 1;
