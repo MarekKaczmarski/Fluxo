@@ -1,9 +1,8 @@
-﻿namespace Fluxo.Application.Categories.Queries.GetCategories
+namespace Fluxo.Application.Categories.Queries.GetCategories;
+
+public record CategoryDto
 {
-    public class CategoryDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = default!;
-        public string? Icon { get; set; }
-    }
+    public Guid Id { get; init; }
+    public string Name { get; init; } = default!;
+    public string? Icon { get; init; }
 }

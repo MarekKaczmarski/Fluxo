@@ -1,9 +1,9 @@
-﻿namespace Fluxo.Application.Accounts.Queries.GetAccounts;
+namespace Fluxo.Application.Accounts.Queries.GetAccounts;
 
-public class AccountDto
+public record AccountDto
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public decimal Balance { get; set; }
-    public string Currency { get; set; } = "PLN";
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public decimal Balance { get; init; }
+    public string Currency { get; init; } = "PLN";
 }
