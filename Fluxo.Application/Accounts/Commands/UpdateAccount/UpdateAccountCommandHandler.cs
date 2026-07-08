@@ -7,20 +7,30 @@ namespace Fluxo.Application.Accounts.Commands.UpdateAccount;
 
 public class UpdateAccountCommandHandler(
     IFluxoDbContext context,
-    IValidator<UpdateAccountCommand> validator) : IUpdateAccountCommandHandler
+    IValidator<UpdateAccountCommand> validator
+) : IUpdateAccountCommandHandler
 {
-    public async Task HandleAsync(UpdateAccountCommand command, CancellationToken ct = default)
+    public async Task HandleAsync(UpdateAccountCommand command, CancellationToken ct)
     {
         var validationResult = await validator.ValidateAsync(command, ct);
-        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
 
-        var account = await context.Accounts
-            .FirstOrDefaultAsync(a => a.Id == command.Id, ct);
-
-        if (account is null)
-            throw new NotFoundException($"Account with ID {command.Id} was not found.");
+        var account =
+            await context.Accounts.FirstOrDefaultAsync(a => a.Id == command.Id, ct)
+            ?? throw new NotFoundException($"Account with ID {command.Id} was not found.");
 
         account.UpdateName(command.Name);
-        await context.SaveChangesAsync(ct);
+
+        try
+        {
+            await context.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new ConflictException(
+                "The account was modified concurrently. Please retry the update."
+            );
+        }
     }
 }
