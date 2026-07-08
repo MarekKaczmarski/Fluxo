@@ -1,7 +1,6 @@
-﻿namespace Fluxo.Application.Categories.Commands.DeleteCategory
+namespace Fluxo.Application.Categories.Commands.DeleteCategory;
+
+public interface IDeleteCategoryCommandHandler
 {
-    public interface IDeleteCategoryCommandHandler
-    {
-        Task HandleAsync(DeleteCategoryCommand command, CancellationToken ct);
-    }
+    Task HandleAsync(DeleteCategoryCommand command, CancellationToken ct);
 }

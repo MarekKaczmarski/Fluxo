@@ -1,4 +1,4 @@
-﻿namespace Fluxo.Application.Transactions.Queries.GetTransactions;
+namespace Fluxo.Application.Transactions.Queries.GetTransactions;
 
 public interface IGetTransactionsQueryHandler
 {

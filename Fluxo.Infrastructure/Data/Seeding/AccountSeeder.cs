@@ -1,4 +1,4 @@
-﻿using Fluxo.Domain.Entities;
+using Fluxo.Domain.Entities;
 
 namespace Fluxo.Infrastructure.Data.Seeding;
 

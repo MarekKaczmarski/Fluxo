@@ -1,4 +1,4 @@
-﻿using Fluxo.Domain.Entities;
+using Fluxo.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

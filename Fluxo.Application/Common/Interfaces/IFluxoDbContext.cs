@@ -1,4 +1,4 @@
-﻿using Fluxo.Domain.Entities;
+using Fluxo.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fluxo.Application.Common.Interfaces;
