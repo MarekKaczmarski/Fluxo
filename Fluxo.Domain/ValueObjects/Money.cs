@@ -12,7 +12,7 @@ public sealed record Money
     public Money(decimal amount, Currency currency)
     {
         Currency = currency ?? throw new DomainException("Currency is required.");
-        Amount = amount;
+        Amount = Math.Floor(amount * 100) / 100;
     }
 
     public static Money Zero(Currency currency) => new(0, currency);
