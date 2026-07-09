@@ -10,24 +10,16 @@ public class DeleteCategoryCommandHandler(IFluxoDbContext context) : IDeleteCate
 {
     public async Task HandleAsync(DeleteCategoryCommand command, CancellationToken ct)
     {
-        var categoryExists = await context.Categories.AnyAsync(c => c.Id == command.Id, ct);
-
-        if (!categoryExists)
-            throw new NotFoundException($"Category with ID {command.Id} was not found.");
-
-        var hasTransactions = await context.Transactions.AnyAsync(
-            t => t.CategoryId == command.Id,
-            ct
-        );
-
-        if (hasTransactions)
-        {
-            throw new ConflictException("Category cannot be deleted because it has transactions.");
-        }
-
         try
         {
-            await context.Categories.Where(c => c.Id == command.Id).ExecuteDeleteAsync(ct);
+            var category = await context
+                .Categories.Where(c => c.Id == command.Id)
+                .ExecuteDeleteAsync(ct);
+
+            if (category == 0)
+            {
+                throw new NotFoundException($"Category with ID {command.Id} was not found.");
+            }
         }
         catch (PostgresException ex) when (PostgresConstraintHelper.IsForeignKeyViolation(ex))
         {

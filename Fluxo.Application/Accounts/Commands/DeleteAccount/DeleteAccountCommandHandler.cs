@@ -10,22 +10,16 @@ public class DeleteAccountCommandHandler(IFluxoDbContext context) : IDeleteAccou
 {
     public async Task HandleAsync(DeleteAccountCommand command, CancellationToken ct)
     {
-        var accountExists = await context.Accounts.AnyAsync(a => a.Id == command.Id, ct);
-
-        if (!accountExists)
-            throw new NotFoundException($"Account with ID {command.Id} was not found.");
-
-        var hasTransactions = await context.Transactions.AnyAsync(
-            t => t.AccountId == command.Id,
-            ct
-        );
-
-        if (hasTransactions)
-            throw new ConflictException("Account cannot be deleted because it has transactions.");
-
         try
         {
-            await context.Accounts.Where(a => a.Id == command.Id).ExecuteDeleteAsync(ct);
+            var account = await context
+                .Accounts.Where(a => a.Id == command.Id)
+                .ExecuteDeleteAsync(ct);
+
+            if (account == 0)
+            {
+                throw new NotFoundException($"Account with ID {command.Id} was not found.");
+            }
         }
         catch (PostgresException ex) when (PostgresConstraintHelper.IsForeignKeyViolation(ex))
         {
