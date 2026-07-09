@@ -16,6 +16,15 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
             .MustAsync((name, ct) => BeUniqueNameAsync(uniquenessChecker, name, ct))
             .WithMessage("Account with this name already exists.");
 
+        RuleFor(x => x.InitialBalance)
+            .Cascade(CascadeMode.Stop)
+            .GreaterThan(0)
+            .WithMessage("Initial balance must be greater than zero.")
+            .Must(initialBalance => Math.Truncate(initialBalance) <= 999_999_999_999)
+            .WithMessage(
+                "Initial balance cannot have more than 12 digits before the decimal point."
+            );
+
         RuleFor(x => x.Currency)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
