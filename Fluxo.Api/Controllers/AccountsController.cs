@@ -47,7 +47,7 @@ public class AccountsController(
         CancellationToken ct
     )
     {
-        if (EnsureMatchingId(id, command.Id) is { } error)
+        if (EnsureMatchingId(id, command.Id) is ActionResult error)
             return error;
 
         await updateAccountHandler.HandleAsync(command, ct);

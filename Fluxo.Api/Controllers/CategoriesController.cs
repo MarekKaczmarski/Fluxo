@@ -47,7 +47,7 @@ public class CategoriesController(
         CancellationToken ct
     )
     {
-        if (EnsureMatchingId(id, command.Id) is { } error)
+        if (EnsureMatchingId(id, command.Id) is ActionResult error)
             return error;
 
         await updateHandler.HandleAsync(command, ct);
