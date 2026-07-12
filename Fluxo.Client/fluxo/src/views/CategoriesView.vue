@@ -106,13 +106,13 @@ async function submitForm() {
     name: form.name.trim(),
   }
 
-  if (isEditing.value) {
-    await store.saveCategory({ ...payload, id: form.id })
-  } else {
-    await store.addCategory(payload)
-  }
+  const saved = isEditing.value
+    ? await store.saveCategory({ ...payload, id: form.id })
+    : await store.addCategory(payload)
 
-  resetForm()
+  if (saved) {
+    resetForm()
+  }
 }
 
 async function removeCategory(categoryId: string) {

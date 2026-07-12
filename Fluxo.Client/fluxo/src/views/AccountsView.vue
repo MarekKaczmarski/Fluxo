@@ -55,20 +55,20 @@ async function submitForm() {
 
   const name = form.name.trim()
 
-  if (isEditing.value) {
-    await store.saveAccount({
-      id: form.id,
-      name,
-    })
-  } else {
-    await store.addAccount({
-      currency: form.currency.trim().toUpperCase(),
-      initialBalance: Number(form.initialBalance) || 0,
-      name,
-    })
-  }
+  const saved = isEditing.value
+    ? await store.saveAccount({
+        id: form.id,
+        name,
+      })
+    : await store.addAccount({
+        currency: form.currency.trim().toUpperCase(),
+        initialBalance: Number(form.initialBalance) || 0,
+        name,
+      })
 
-  resetForm()
+  if (saved) {
+    resetForm()
+  }
 }
 
 async function removeAccount(accountId: string) {
@@ -236,7 +236,7 @@ async function removeAccount(accountId: string) {
   align-items: center;
   background: color-mix(in srgb, var(--color-primary) 14%, white);
   border-radius: 999px;
-  color: var(--color-primary-strong);
+  color: var(--color-on-light);
   display: inline-flex;
   height: 3rem;
   justify-content: center;

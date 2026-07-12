@@ -123,27 +123,38 @@ async function submitForm() {
 
   const amount = Number(form.amount)
 
-  if (isEditing.value) {
-    await store.saveTransaction({
-      amount,
-      categoryId: form.categoryId,
-      date: toApiDate(form.date),
-      description: form.description.trim(),
-      id: form.id,
-      type: form.type,
-    })
-  } else {
-    await store.addTransaction({
-      accountId: form.accountId,
-      amount,
-      categoryId: form.categoryId,
-      date: toApiDate(form.date),
-      description: form.description.trim(),
-      type: form.type,
-    })
-  }
+  const saved = isEditing.value
+    ? await store.saveTransaction({
+        amount,
+        categoryId: form.categoryId,
+        date: toApiDate(form.date),
+        description: form.description.trim(),
+        id: form.id,
+        type: form.type,
+      })
+    : await store.addTransaction({
+        accountId: form.accountId,
+        amount,
+        categoryId: form.categoryId,
+        date: toApiDate(form.date),
+        description: form.description.trim(),
+        type: form.type,
+      })
 
-  resetForm()
+  if (saved) {
+    resetForm()
+  }
+}
+
+function blockMinusKey(event: KeyboardEvent) {
+  if (event.key === '-') {
+    event.preventDefault()
+  }
+}
+
+function openDatePicker() {
+  const input = document.getElementById('transaction-date') as HTMLInputElement
+  input.showPicker()
 }
 
 async function removeTransaction(transaction: TransactionDto) {
@@ -224,6 +235,7 @@ function categoryColor(categoryId: string) {
                   type="number"
                   :rules="[required, positiveAmount]"
                   :error-messages="store.fieldError('Amount')"
+                  @keydown="blockMinusKey"
                 />
               </div>
               <div class="field">
@@ -235,6 +247,7 @@ function categoryColor(categoryId: string) {
                   append-inner-icon="mdi-calendar"
                   :rules="[required]"
                   :error-messages="store.fieldError('Date')"
+                  @click="openDatePicker"
                 />
               </div>
             </div>
@@ -428,7 +441,7 @@ function categoryColor(categoryId: string) {
 .filter-tabs button.filter-tabs__button--active {
   background: white;
   box-shadow: 0 6px 16px rgb(0 0 0 / 8%);
-  color: var(--color-primary-strong);
+  color: var(--color-on-light);
 }
 
 .transaction-list__item {
@@ -477,19 +490,6 @@ function categoryColor(categoryId: string) {
   display: flex;
   gap: 0.25rem;
   z-index: 2;
-}
-
-:deep(input[type='date']::-webkit-calendar-picker-indicator) {
-  background: transparent;
-  bottom: 0;
-  color: transparent;
-  cursor: pointer;
-  height: auto;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: auto;
 }
 
 @media (max-width: 860px) {
