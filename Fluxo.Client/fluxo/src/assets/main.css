@@ -22,6 +22,7 @@
   --color-muted-foreground: #6b7280;
   --color-primary: #18181b;
   --color-primary-strong: #000000;
+  --color-on-light: #000000;
   --color-border: #e4e4e7;
   --color-border-strong: #d4d4d8;
 
@@ -38,6 +39,32 @@
   --shadow-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 6%);
 
   --control-height: 2.625rem;
+}
+
+.v-theme--fluxoDark {
+  color-scheme: dark;
+
+  --color-background: #0a0a0b;
+  --color-surface: #18181b;
+  --color-surface-muted: #18181b;
+  --color-surface-strong: #27272a;
+  --color-card: #18181b;
+  --color-card-foreground: #f4f4f5;
+  --color-foreground: #f4f4f5;
+  --color-muted-foreground: #a1a1aa;
+  --color-primary: #3f3f46;
+  --color-primary-strong: #f4f4f5;
+  --color-border: #27272a;
+  --color-border-strong: #3f3f46;
+
+  --color-income: #16a34a;
+  --color-income-strong: #15803d;
+  --color-expense: #dc2626;
+  --color-warning: #d97706;
+  --color-info: #2563eb;
+  --color-violet: #7c3aed;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 30%);
 }
 
 * {
@@ -149,6 +176,10 @@ a {
 
 .v-card {
   box-shadow: var(--shadow-card);
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  display: none;
 }
 
 .balance-pill {
