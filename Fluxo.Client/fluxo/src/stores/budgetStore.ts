@@ -56,13 +56,14 @@ export const useBudgetStore = defineStore('budget', () => {
     return error.value?.fields[field] ?? []
   }
 
-  async function runSaving(task: () => Promise<void>) {
+  async function runSaving(task: () => Promise<void>): Promise<boolean> {
     isSaving.value = true
     error.value = null
 
     try {
       await task()
       await fetchAll()
+      return true
     } catch (err: unknown) {
       console.log('Error during saving:', err)
       if (err instanceof ApiError && err.status === 400) {
@@ -81,6 +82,7 @@ export const useBudgetStore = defineStore('budget', () => {
           fields: {},
         }
       }
+      return false
     } finally {
       isSaving.value = false
     }
@@ -111,55 +113,55 @@ export const useBudgetStore = defineStore('budget', () => {
   }
 
   async function addTransaction(data: CreateTransactionRequest) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await createTransaction(data)
     })
   }
 
   async function saveTransaction(data: UpdateTransactionRequest) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await updateTransaction(data.id, data)
     })
   }
 
   async function removeTransaction(id: string) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await deleteTransaction(id)
     })
   }
 
   async function addCategory(data: CreateCategoryRequest) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await createCategory(data)
     })
   }
 
   async function saveCategory(data: UpdateCategoryRequest) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await updateCategory(data.id, data)
     })
   }
 
   async function removeCategory(id: string) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await deleteCategory(id)
     })
   }
 
   async function addAccount(data: CreateAccountRequest) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await createAccount(data)
     })
   }
 
   async function saveAccount(data: UpdateAccountRequest) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await updateAccount(data.id, data)
     })
   }
 
   async function removeAccount(id: string) {
-    await runSaving(async () => {
+    return runSaving(async () => {
       await deleteAccount(id)
     })
   }
