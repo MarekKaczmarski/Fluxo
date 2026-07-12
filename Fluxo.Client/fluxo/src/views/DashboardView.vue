@@ -137,13 +137,6 @@ function changeMonth(amount: number) {
 
 <template>
   <main class="dashboard-view">
-    <header class="dashboard-view__topbar">
-      <div class="dashboard-view__brand">
-        <h1>Fluxo</h1>
-        <span>Your budget app</span>
-      </div>
-    </header>
-
     <section class="dashboard-view__month" aria-label="Month selection">
       <button type="button" @click="changeMonth(-1)">
         <ChevronLeft :size="18" />
